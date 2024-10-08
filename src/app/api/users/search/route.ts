@@ -1,8 +1,11 @@
+// File: src/app/api/users/search/route.ts
+
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { PrismaClient } from "@prisma/client";
 import { UnauthorizedError, BadRequestError, InternalServerError } from '@/lib/errors';
+import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
 
 const prisma = new PrismaClient();
@@ -15,6 +18,8 @@ export async function GET(req: Request) {
       throw new UnauthorizedError();
     }
 
+    await checkUserBanStatus(parseInt(session.user.id));
+
     const { searchParams } = new URL(req.url);
     const query = searchParams.get('q');
     
@@ -24,14 +29,15 @@ export async function GET(req: Request) {
 
     const users = await prisma.user.findMany({
       where: {
-        username: {
-          contains: query,
-          mode: 'insensitive',
-        },
+        OR: [
+          { username: { contains: query, mode: 'insensitive' } },
+          { email: { contains: query, mode: 'insensitive' } },
+        ],
       },
       select: {
         id: true,
         username: true,
+        email: true,
         profilePicture: true,
       },
       take: 10,

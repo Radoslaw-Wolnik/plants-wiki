@@ -1,18 +1,24 @@
+// File: src/app/api/auth/register/route.ts
+
 import { NextResponse } from 'next/server';
 import { PrismaClient } from "@prisma/client";
+import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { BadRequestError, ConflictError, InternalServerError } from '@/lib/errors';
 import logger from '@/lib/logger';
 
 const prisma = new PrismaClient();
 
+const userSchema = z.object({
+  username: z.string().min(3).max(20),
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
 export async function POST(req: Request) {
   try {
-    const { username, email, password } = await req.json();
-
-    if (!username || !email || !password) {
-      throw new BadRequestError("Missing required fields");
-    }
+    const body = await req.json();
+    const { username, email, password } = userSchema.parse(body);
 
     const existingUser = await prisma.user.findFirst({
       where: {
@@ -41,6 +47,9 @@ export async function POST(req: Request) {
     logger.info('New user registered', { userId: newUser.id });
     return NextResponse.json(userWithoutPassword, { status: 201 });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors }, { status: 400 });
+    }
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
