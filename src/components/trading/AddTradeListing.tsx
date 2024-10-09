@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Modal from '../common/Modal';
-import ImageUpload from '../ImageUpload';
+import ImageUpload from '../common/ImageUpload';
 
 interface AddTradeListingProps {
   isOpen: boolean;
