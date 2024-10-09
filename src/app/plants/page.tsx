@@ -1,36 +1,45 @@
-// File: src/app/plants/page.tsx
+// src/pages/plants/page.tsx
 
-import React from 'react';
-import Link from 'next/link';
-import PlantCard from '@/components/PlantCard';
-import SearchBar from '@/components/SearchBar';
-import Pagination from '@/components/Pagination';
+import React, { useState, useEffect } from 'react';
+import Layout from '../../components/Layout';
+import PlantCard from '../../components/PlantCard';
+import Pagination from '../../components/Pagination';
 
-async function getPlants(search: string = '', page: number = 1) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/plants?search=${search}&page=${page}`, { cache: 'no-store' });
-  if (!res.ok) {
-    throw new Error('Failed to fetch plants');
-  }
-  return res.json();
-}
+const PlantsPage: React.FC = () => {
+  const [plants, setPlants] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState('');
 
-export default async function PlantsPage({ searchParams }: { searchParams: { search?: string; page?: string } }) {
-  const search = searchParams.search || '';
-  const page = parseInt(searchParams.page || '1');
-  const { plants, totalCount, currentPage, totalPages } = await getPlants(search, page);
+  useEffect(() => {
+    fetchPlants();
+  }, [page, search]);
+
+  const fetchPlants = async () => {
+    const response = await fetch(`/api/plants?page=${page}&search=${search}`);
+    const data = await response.json();
+    setPlants(data.plants);
+    setTotalPages(data.totalPages);
+  };
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Plant Database</h1>
-      <SearchBar initialSearch={search} />
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+    <Layout>
+      <h1 className="text-3xl font-bold mb-6">Plants</h1>
+      <input
+        type="text"
+        placeholder="Search plants..."
+        className="w-full p-2 mb-4 border rounded"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {plants.map((plant) => (
-          <Link key={plant.id} href={`/plants/${plant.id}`}>
-            <PlantCard name={plant.name} image={plant.icon} scientificName={plant.scientificName} />
-          </Link>
+          <PlantCard key={plant.id} plant={plant} />
         ))}
       </div>
-      <Pagination currentPage={currentPage} totalPages={totalPages} />
-    </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+    </Layout>
   );
-}
+};
+
+export default PlantsPage;
