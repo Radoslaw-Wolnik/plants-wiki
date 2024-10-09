@@ -6,13 +6,20 @@ A comprehensive website for plant enthusiasts to share knowledge, manage their p
 
 - User authentication and authorization with different roles (Admin, Moderator, User)
 - Detailed plant database with comprehensive information
-- Wiki-style articles for each plant species
+- Wikipedia-style articles for each plant species with version history
 - User plant libraries with watering and fertilizing logs
 - Room management for organizing plant collections
-- Discussion forums for articles
+- Calendar for plant care scheduling
 - Wishlist and plant graveyard tracking
-- Moderation system for content
-- Search functionality for plants and articles
+- Discussion forums for articles
+- Moderation system for content (5 moderator approvals required for changes)
+- Search functionality for plants, articles, and users
+- Image upload and hosting for plants and user profiles
+- User flagging system for inappropriate content
+- Friend system for connecting with other users
+- Moderator request system for eligible users
+- Admin dashboard for site statistics and user management
+- Plant trading system for users to exchange plants
 - Responsive design using Tailwind CSS
 
 ## Tech Stack
@@ -28,7 +35,7 @@ A comprehensive website for plant enthusiasts to share knowledge, manage their p
 ## Prerequisites
 
 - Node.js (v14 or later)
-- Docker and Docker Compose (for containerized deployment)
+- Docker and Docker Compose
 - PostgreSQL (if running without Docker)
 
 ## Installation
@@ -64,18 +71,6 @@ A comprehensive website for plant enthusiasts to share knowledge, manage their p
 
 ## Deployment
 
-### Without Docker
-
-1. Build the application:
-   ```
-   npm run build
-   ```
-
-2. Start the production server:
-   ```
-   npm start
-   ```
-
 ### With Docker
 
 1. Build and start the containers:
@@ -89,14 +84,6 @@ A comprehensive website for plant enthusiasts to share knowledge, manage their p
    ```
 
 The application should now be running at `http://localhost:3000`.
-
-## API Documentation
-
-For detailed API documentation, please refer to the [API.md](API.md) file.
-
-## Data Models
-
-For information about the data models used in this application, please see the [MODELS.md](MODELS.md) file.
 
 ## Contributing
 
