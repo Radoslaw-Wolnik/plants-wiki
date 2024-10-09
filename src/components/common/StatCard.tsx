@@ -1,4 +1,4 @@
-// src/components/StatCard.tsx
+// src/components/common/StatCard.tsx
 
 import React from 'react';
 

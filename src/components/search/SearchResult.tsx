@@ -1,4 +1,4 @@
-// src/components/SearchResults.tsx
+// src/components/search/SearchResults.tsx
 
 import React from 'react';
 import Link from 'next/link';

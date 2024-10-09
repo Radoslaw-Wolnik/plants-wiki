@@ -1,4 +1,4 @@
-// src/components/UserAvatar.tsx
+// src/components/users/UserAvatar.tsx
 
 import React from 'react';
 import Image from 'next/image';

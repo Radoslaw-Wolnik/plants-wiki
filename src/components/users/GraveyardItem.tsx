@@ -1,4 +1,4 @@
-// src/components/GraveyardItem.tsx
+// src/components/users/GraveyardItem.tsx
 
 import React from 'react';
 import { formatDate } from '../utils/dateUtils';

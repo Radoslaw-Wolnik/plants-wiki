@@ -1,4 +1,4 @@
-// src/components/Pagination.tsx
+// src/components/common/Pagination.tsx
 
 import React from 'react';
 

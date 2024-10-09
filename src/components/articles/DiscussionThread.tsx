@@ -1,4 +1,4 @@
-// src/components/DiscussionThread.tsx
+// src/components/articles/DiscussionThread.tsx
 
 import React from 'react';
 import { formatDate } from '../utils/dateUtils';

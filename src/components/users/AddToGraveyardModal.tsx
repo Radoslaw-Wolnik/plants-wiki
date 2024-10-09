@@ -1,4 +1,4 @@
-// src/components/AddToGraveyardModal.tsx
+// src/components/users/AddToGraveyardModal.tsx
 
 import React, { useState } from 'react';
 import Modal from './Modal';

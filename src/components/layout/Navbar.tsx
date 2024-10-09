@@ -1,4 +1,4 @@
-// src/components/Navbar.tsx
+// src/components/layout/Navbar.tsx
 
 import React from 'react';
 import Link from 'next/link';

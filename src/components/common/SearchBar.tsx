@@ -1,4 +1,4 @@
-// src/components/SearchBar.tsx
+// src/components/common/SearchBar.tsx
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';

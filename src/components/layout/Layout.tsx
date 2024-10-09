@@ -1,4 +1,4 @@
-// File: src/components/Layout.tsx
+// File: src/components/layout/Layout.tsx
 
 import React from 'react';
 import Head from 'next/head';

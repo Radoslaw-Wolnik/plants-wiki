@@ -1,4 +1,4 @@
-// src/components/Calendar.tsx
+// src/components/calendar/Calendar.tsx
 
 import React from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';

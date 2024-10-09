@@ -1,4 +1,4 @@
-// File: src/components/UserProfile.tsx
+// File: src/components/users/UserProfile.tsx
 
 import React, { useState } from 'react';
 import Image from 'next/image';

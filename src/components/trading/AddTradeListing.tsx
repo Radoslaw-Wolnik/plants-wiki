@@ -1,4 +1,4 @@
-// src/components/AddTradeListing.tsx
+// src/components/trading/AddTradeListing.tsx
 
 import React, { useState } from 'react';
 import Modal from '../common/Modal';

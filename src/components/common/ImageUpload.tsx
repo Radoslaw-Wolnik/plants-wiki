@@ -1,4 +1,4 @@
-// File: src/components/ImageUpload.tsx
+// File: src/components/common/ImageUpload.tsx
 
 import React, { useState } from 'react';
 

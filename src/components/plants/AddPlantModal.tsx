@@ -1,4 +1,4 @@
-// src/components/AddPlantModal.tsx
+// src/components/plants/AddPlantModal.tsx
 
 import React, { useState } from 'react';
 import Modal from '../common/Modal';
