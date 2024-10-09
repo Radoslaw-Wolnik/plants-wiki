@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import RoomCard from '../../components/RoomCard';
-import AddPlantModal from '../../components/AddPlantModal';
+import AddPlantModal from '../../components/plants/AddPlantModal';
 
 const UserLibraryPage: React.FC = () => {
   const [rooms, setRooms] = useState([]);

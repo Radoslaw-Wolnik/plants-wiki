@@ -1,29 +1,35 @@
-// src/components/AddPlantModal.tsx
+// src/components/AddTradeListing.tsx
 
 import React, { useState } from 'react';
-import Modal from './Modal';
+import Modal from '../common/Modal';
+import ImageUpload from '../ImageUpload';
 
-interface AddPlantModalProps {
+interface AddTradeListingProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddPlant: (plantData: any) => void;
+  onAdd: (listingData: { plantName: string; description: string; image: string }) => void;
 }
 
-const AddPlantModal: React.FC<AddPlantModalProps> = ({ isOpen, onClose, onAddPlant }) => {
+const AddTradeListing: React.FC<AddTradeListingProps> = ({ isOpen, onClose, onAdd }) => {
   const [plantName, setPlantName] = useState('');
-  const [roomId, setRoomId] = useState('');
+  const [description, setDescription] = useState('');
+  const [image, setImage] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAddPlant({ plantName, roomId });
+    onAdd({ plantName, description, image });
     setPlantName('');
-    setRoomId('');
-    onClose();
+    setDescription('');
+    setImage('');
+  };
+
+  const handleImageUpload = (imageUrl: string) => {
+    setImage(imageUrl);
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <h2 className="text-2xl font-bold mb-4">Add New Plant</h2>
+      <h2 className="text-2xl font-bold mb-4">Add Trade Listing</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="plantName" className="block text-sm font-medium text-gray-700">
@@ -39,26 +45,28 @@ const AddPlantModal: React.FC<AddPlantModalProps> = ({ isOpen, onClose, onAddPla
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="roomId" className="block text-sm font-medium text-gray-700">
-            Room
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            Description
           </label>
-          <select
-            id="roomId"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            rows={3}
             required
-          >
-            <option value="">Select a room</option>
-            {/* Add room options here */}
-          </select>
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">Plant Image</label>
+          <ImageUpload onUpload={handleImageUpload} />
         </div>
         <div className="flex justify-end">
           <button
             type="submit"
             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
           >
-            Add Plant
+            Create Listing
           </button>
         </div>
       </form>
@@ -66,4 +74,4 @@ const AddPlantModal: React.FC<AddPlantModalProps> = ({ isOpen, onClose, onAddPla
   );
 };
 
-export default AddPlantModal;
+export default AddTradeListing;

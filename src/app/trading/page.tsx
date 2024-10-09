@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Layout from '../../components/Layout';
 import TradeListingCard from '../../components/TradeListingCard';
-import AddTradeListing from '../../components/AddTradeListing';
+import AddTradeListing from '../../components/trading/AddTradeListing';
 
 interface TradeListing {
   id: number;
