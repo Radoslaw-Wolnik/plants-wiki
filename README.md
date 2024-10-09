@@ -92,3 +92,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## improvements:
+ - [ ] Optimize performance by implementing lazy loading for components and images where appropriate
+ - [ ] Implement proper error handling and loading states for components that fetch data.
+ - [ ] Set up Storybook to showcase and document the common components, making it easier for developers to use them correctly.
+ - [ ] Create a theme configuration file to centralize color schemes and other design tokens.

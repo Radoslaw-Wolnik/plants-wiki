@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
+import { Button } from '../common';
 
 const Navbar: React.FC = () => {
   const { data: session } = useSession();
@@ -14,18 +15,20 @@ const Navbar: React.FC = () => {
           Plant Wiki
         </Link>
         <div className="space-x-4">
-          <Link href="/plants" className="hover:text-green-200">Plants</Link>
-          <Link href="/articles" className="hover:text-green-200">Articles</Link>
+          <NavLink href="/plants">Plants</NavLink>
+          <NavLink href="/articles">Articles</NavLink>
           {session ? (
             <>
-              <Link href="/profile" className="hover:text-green-200">Profile</Link>
-              <Link href="/library" className="hover:text-green-200">My Library</Link>
-              <button onClick={() => signOut()} className="hover:text-green-200">Sign Out</button>
+              <NavLink href="/profile">Profile</NavLink>
+              <NavLink href="/library">My Library</NavLink>
+              <Button variant="secondary" size="small" onClick={() => signOut()}>
+                Sign Out
+              </Button>
             </>
           ) : (
             <>
-              <Link href="/signin" className="hover:text-green-200">Sign In</Link>
-              <Link href="/signup" className="hover:text-green-200">Sign Up</Link>
+              <NavLink href="/signin">Sign In</NavLink>
+              <NavLink href="/signup">Sign Up</NavLink>
             </>
           )}
         </div>
@@ -33,5 +36,11 @@ const Navbar: React.FC = () => {
     </nav>
   );
 };
+
+const NavLink: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => (
+  <Link href={href} className="hover:text-green-200">
+    {children}
+  </Link>
+);
 
 export default Navbar;

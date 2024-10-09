@@ -1,6 +1,7 @@
 // src/components/articles/CommentForm.tsx
 
 import React, { useState } from 'react';
+import { Button, TextArea } from '../common';
 
 interface CommentFormProps {
   onSubmit: (content: string) => void;
@@ -19,19 +20,15 @@ const CommentForm: React.FC<CommentFormProps> = ({ onSubmit }) => {
 
   return (
     <form onSubmit={handleSubmit} className="mt-4">
-      <textarea
+      <TextArea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className="w-full p-2 border rounded-md"
-        rows={3}
         placeholder="Add a comment..."
+        rows={3}
       />
-      <button
-        type="submit"
-        className="mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-      >
+      <Button type="submit" className="mt-2">
         Submit
-      </button>
+      </Button>
     </form>
   );
 };

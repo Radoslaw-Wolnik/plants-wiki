@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { Card, Button, TextArea } from '../common';
+import { formatDate } from '../../utils';
 
 interface CareTip {
   id: number;
@@ -47,34 +49,32 @@ const PlantCareTips: React.FC<PlantCareTipsProps> = ({ plantId }) => {
     }
   };
 
+  // src/components/plants/PlantCareTips.tsx (continued)
+
   return (
     <div className="mt-8">
       <h3 className="text-2xl font-semibold mb-4">Care Tips</h3>
-      <ul className="space-y-4">
+      <Card>
         {careTips.map((tip) => (
-          <li key={tip.id} className="bg-gray-100 p-4 rounded-lg">
+          <div key={tip.id} className="mb-4 last:mb-0 p-4 bg-gray-50 rounded-lg">
             <p>{tip.content}</p>
             <p className="text-sm text-gray-600 mt-2">
-              By {tip.author.username} on {new Date(tip.createdAt).toLocaleDateString()}
+              By {tip.author.username} on {formatDate(tip.createdAt)}
             </p>
-          </li>
+          </div>
         ))}
-      </ul>
+      </Card>
       {session && (
         <form onSubmit={handleAddTip} className="mt-6">
-          <textarea
+          <TextArea
             value={newTip}
             onChange={(e) => setNewTip(e.target.value)}
-            className="w-full p-2 border rounded-lg"
             placeholder="Add a new care tip..."
             rows={3}
           />
-          <button
-            type="submit"
-            className="mt-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-          >
+          <Button type="submit" className="mt-2">
             Add Tip
-          </button>
+          </Button>
         </form>
       )}
     </div>

@@ -2,14 +2,17 @@
 
 import React from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
+import { Card } from '../common';
+
+interface CalendarEvent {
+  id: number;
+  date: string;
+  type: string;
+  plantName: string;
+}
 
 interface CalendarProps {
-  events: Array<{
-    id: number;
-    date: string;
-    type: string;
-    plantName: string;
-  }>;
+  events: CalendarEvent[];
 }
 
 const Calendar: React.FC<CalendarProps> = ({ events }) => {
@@ -18,8 +21,36 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
   const monthEnd = endOfMonth(today);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
+  const renderDay = (date: Date) => {
+    const dayEvents = events.filter(
+      (event) => format(new Date(event.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+    );
+    return (
+      <div
+        key={date.toISOString()}
+        className={`p-2 border ${
+          format(date, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
+            ? 'bg-green-100'
+            : ''
+        }`}
+      >
+        <div className="text-right">{format(date, 'd')}</div>
+        {dayEvents.map((event) => (
+          <div
+            key={event.id}
+            className={`text-xs p-1 mt-1 rounded ${
+              event.type === 'watering' ? 'bg-blue-100' : 'bg-yellow-100'
+            }`}
+          >
+            {event.type}: {event.plantName}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <Card className="overflow-hidden">
       <div className="p-4 bg-green-500 text-white font-bold text-xl">
         {format(today, 'MMMM yyyy')}
       </div>
@@ -29,35 +60,9 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
             {day}
           </div>
         ))}
-        {daysInMonth.map((date) => {
-          const dayEvents = events.filter(
-            (event) => format(new Date(event.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
-          );
-          return (
-            <div
-              key={date.toISOString()}
-              className={`p-2 border ${
-                format(date, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
-                  ? 'bg-green-100'
-                  : ''
-              }`}
-            >
-              <div className="text-right">{format(date, 'd')}</div>
-              {dayEvents.map((event) => (
-                <div
-                  key={event.id}
-                  className={`text-xs p-1 mt-1 rounded ${
-                    event.type === 'watering' ? 'bg-blue-100' : 'bg-yellow-100'
-                  }`}
-                >
-                  {event.type}: {event.plantName}
-                </div>
-              ))}
-            </div>
-          );
-        })}
+        {daysInMonth.map(renderDay)}
       </div>
-    </div>
+    </Card>
   );
 };
 

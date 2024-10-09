@@ -1,48 +1,35 @@
 // src/components/articles/DiscussionThread.tsx
 
 import React from 'react';
-import { formatDate } from '../utils/dateUtils';
+import { Card } from '../common';
+import { formatDate } from '../../utils';
 
-interface DiscussionThreadProps {
-  discussion: {
-    id: number;
-    content: string;
-    createdAt: string;
-    author: {
-      username: string;
-    };
-    replies: Array<{
-      id: number;
-      content: string;
-      createdAt: string;
-      author: {
-        username: string;
-      };
-    }>;
+interface Discussion {
+  id: number;
+  content: string;
+  createdAt: string;
+  author: {
+    username: string;
   };
+  replies: Discussion[];
 }
 
-const DiscussionThread: React.FC<DiscussionThreadProps> = ({ discussion }) => (
-  <div className="bg-white rounded-lg shadow-md p-4">
-    <div className="mb-4">
-      <p className="text-lg">{discussion.content}</p>
+interface DiscussionThreadProps {
+  discussion: Discussion;
+}
+
+const DiscussionThread: React.FC<DiscussionThreadProps> = ({ discussion }) => {
+  const renderDiscussion = (disc: Discussion, depth = 0) => (
+    <Card key={disc.id} className={`mb-4 ${depth > 0 ? 'ml-8' : ''}`}>
+      <p className="text-lg">{disc.content}</p>
       <p className="text-sm text-gray-600 mt-2">
-        Posted by {discussion.author.username} on {formatDate(discussion.createdAt)}
+        Posted by {disc.author.username} on {formatDate(disc.createdAt)}
       </p>
-    </div>
-    {discussion.replies.length > 0 && (
-      <div className="ml-8 space-y-4">
-        {discussion.replies.map((reply) => (
-          <div key={reply.id} className="bg-gray-100 rounded-lg p-3">
-            <p>{reply.content}</p>
-            <p className="text-sm text-gray-600 mt-2">
-              Reply by {reply.author.username} on {formatDate(reply.createdAt)}
-            </p>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
+      {disc.replies.map(reply => renderDiscussion(reply, depth + 1))}
+    </Card>
+  );
+
+  return renderDiscussion(discussion);
+};
 
 export default DiscussionThread;

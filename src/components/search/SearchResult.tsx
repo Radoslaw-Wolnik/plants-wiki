@@ -2,70 +2,66 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { Card } from '../common';
+import { Plant, Article, User } from '../../types';
 
 interface SearchResultsProps {
   results: {
-    plants: any[];
-    articles: any[];
-    users: any[];
+    plants: Plant[];
+    articles: Article[];
+    users: User[];
   };
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ results }) => {
   return (
     <div className="space-y-8">
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">Plants</h2>
-        {results.plants.length > 0 ? (
-          <ul className="space-y-2">
-            {results.plants.map((plant) => (
-              <li key={plant.id}>
-                <Link href={`/plants/${plant.id}`} className="text-blue-600 hover:underline">
-                  {plant.name} ({plant.scientificName})
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No plants found.</p>
-        )}
-      </section>
-
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">Articles</h2>
-        {results.articles.length > 0 ? (
-          <ul className="space-y-2">
-            {results.articles.map((article) => (
-              <li key={article.id}>
-                <Link href={`/articles/${article.id}`} className="text-blue-600 hover:underline">
-                  {article.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No articles found.</p>
-        )}
-      </section>
-
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">Users</h2>
-        {results.users.length > 0 ? (
-          <ul className="space-y-2">
-            {results.users.map((user) => (
-              <li key={user.id}>
-                <Link href={`/users/${user.id}`} className="text-blue-600 hover:underline">
-                  {user.username}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No users found.</p>
-        )}
-      </section>
+      <ResultSection title="Plants" items={results.plants} renderItem={renderPlantItem} />
+      <ResultSection title="Articles" items={results.articles} renderItem={renderArticleItem} />
+      <ResultSection title="Users" items={results.users} renderItem={renderUserItem} />
     </div>
   );
 };
+
+interface ResultSectionProps<T> {
+  title: string;
+  items: T[];
+  renderItem: (item: T) => React.ReactNode;
+}
+
+function ResultSection<T>({ title, items, renderItem }: ResultSectionProps<T>) {
+  return (
+    <Card>
+      <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+      {items.length > 0 ? (
+        <ul className="space-y-2">
+          {items.map((item, index) => (
+            <li key={index}>{renderItem(item)}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>No {title.toLowerCase()} found.</p>
+      )}
+    </Card>
+  );
+}
+
+const renderPlantItem = (plant: Plant) => (
+  <Link href={`/plants/${plant.id}`} className="text-blue-600 hover:underline">
+    {plant.name} ({plant.scientificName})
+  </Link>
+);
+
+const renderArticleItem = (article: Article) => (
+  <Link href={`/articles/${article.id}`} className="text-blue-600 hover:underline">
+    {article.title}
+  </Link>
+);
+
+const renderUserItem = (user: User) => (
+  <Link href={`/users/${user.id}`} className="text-blue-600 hover:underline">
+    {user.username}
+  </Link>
+);
 
 export default SearchResults;

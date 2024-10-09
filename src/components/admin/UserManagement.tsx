@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { Card, Input, Button, Table } from '../common';
+import { User } from '../../types';
 
 const UserManagement: React.FC = () => {
   const { data: session } = useSession();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -39,55 +41,42 @@ const UserManagement: React.FC = () => {
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const columns = [
+    { header: 'Username', accessor: 'username' },
+    { header: 'Email', accessor: 'email' },
+    { header: 'Role', accessor: 'role' },
+    { 
+      header: 'Status', 
+      accessor: 'isBanned',
+      cell: (value: boolean) => value ? 'Banned' : 'Active'
+    },
+    {
+      header: 'Actions',
+      accessor: 'id',
+      cell: (value: number, row: User) => (
+        <Button
+          variant={row.isBanned ? 'primary' : 'danger'}
+          size="small"
+          onClick={() => row.isBanned ? handleUnbanUser(value) : handleBanUser(value)}
+        >
+          {row.isBanned ? 'Unban' : 'Ban'}
+        </Button>
+      )
+    }
+  ];
+
   return (
-    <div>
+    <Card>
       <h2 className="text-2xl font-semibold mb-4">User Management</h2>
-      <input
+      <Input
         type="text"
         placeholder="Search users..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full p-2 mb-4 border rounded"
+        className="mb-4"
       />
-      <table className="w-full">
-        <thead>
-          <tr>
-            <th className="text-left">Username</th>
-            <th className="text-left">Email</th>
-            <th className="text-left">Role</th>
-            <th className="text-left">Status</th>
-            <th className="text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredUsers.map((user) => (
-            <tr key={user.id}>
-              <td>{user.username}</td>
-              <td>{user.email}</td>
-              <td>{user.role}</td>
-              <td>{user.isBanned ? 'Banned' : 'Active'}</td>
-              <td>
-                {user.isBanned ? (
-                  <button
-                    onClick={() => handleUnbanUser(user.id)}
-                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded text-sm"
-                  >
-                    Unban
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleBanUser(user.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded text-sm"
-                  >
-                    Ban
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+      <Table columns={columns} data={filteredUsers} />
+    </Card>
   );
 };
 

@@ -1,13 +1,8 @@
 // src/components/plants/UserPlantSelector.tsx
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-
-interface Plant {
-  id: number;
-  name: string;
-  image: string;
-}
+import { PlantSelector } from '../common';
+import { Plant } from '../../types';
 
 interface UserPlantSelectorProps {
   onSelect: (plant: Plant | null) => void;
@@ -35,26 +30,11 @@ const UserPlantSelector: React.FC<UserPlantSelectorProps> = ({ onSelect }) => {
   return (
     <div>
       <h3 className="text-xl font-semibold mb-4">Select a plant to offer:</h3>
-      <div className="grid grid-cols-2 gap-4">
-        {userPlants.map((plant) => (
-          <div
-            key={plant.id}
-            className={`border p-2 rounded-lg cursor-pointer ${
-              selectedPlant?.id === plant.id ? 'border-green-500' : 'border-gray-300'
-            }`}
-            onClick={() => handlePlantSelect(plant)}
-          >
-            <Image
-              src={plant.image}
-              alt={plant.name}
-              width={100}
-              height={100}
-              className="w-full h-32 object-cover rounded-md mb-2"
-            />
-            <p className="text-center">{plant.name}</p>
-          </div>
-        ))}
-      </div>
+      <PlantSelector
+        plants={userPlants}
+        selectedPlant={selectedPlant}
+        onSelect={handlePlantSelect}
+      />
     </div>
   );
 };
