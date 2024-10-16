@@ -101,9 +101,9 @@ model UserPlantPhoto {
   id          Int       @id @default(autoincrement())
   userPlant   UserPlant @relation(fields: [userPlantId], references: [id])
   userPlantId Int
-  photoUrl    String
+  url    String
   description String?
-  takenAt     DateTime
+  takenAt     DateTime @default(now())
 }
 
 model Plant {
