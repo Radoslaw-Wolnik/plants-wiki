@@ -11,31 +11,33 @@ datasource db {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
-  username        String    @unique
-  email           String    @unique
-  password        String
-  profilePicture  String?
-  role            UserRole  @default(USER)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  library         UserLibrary?
-  articles        Article[]
-  comments        Comment[]
-  friends         User[]    @relation("UserFriends")
-  friendsOf       User[]    @relation("UserFriends")
-  wishlistPlants  WishlistPlant[]
-  graveyardPlants GraveyardPlant[]
-  rooms           Room[]
-  changeRequests  ChangeRequest[]
-  approvals       Approval[]
-  flags           UserFlag[]
-  strikes         Int       @default(0)
-  isBanned        Boolean   @default(false)
-  banExpiresAt    DateTime?
-  Deactivated     DataTime?
+  id                Int                @id @default(autoincrement())
+  username          String             @unique
+  email             String             @unique
+  password          String
+  profilePicture    String?
+  role              UserRole           @default(USER)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  tokens            Token[]
+  library           UserLibrary?
+  articles          Article[]          @relation("ArticleContributors")
+  comments          Comment[]
+  friends           User[]             @relation("UserFriends")
+  friendsOf         User[]             @relation("UserFriends")
+  wishlistPlants    WishlistPlant[]
+  graveyardPlants   GraveyardPlant[]
+  rooms             Room[] // userRooms
+  changeRequests    ChangeRequest[]
+  approvals         Approval[]
   moderatorRequests ModeratorRequest[]
-  lastActive        DateTime @default(now())
+  flags             UserFlag[]
+  strikes           Int                @default(0)
+  isBanned          Boolean            @default(false)
+  banExpiresAt      DateTime?
+  Deactivated       DateTime?
+  lastActive        DateTime           @default(now())
+  Discussion        Discussion[]
 }
 
 enum UserRole {
@@ -44,27 +46,44 @@ enum UserRole {
   ADMIN
 }
 
+model Token {
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int // Foreign key to User
+  token     String    @unique
+  type      TokenType // Enum for token types
+  expiresAt DateTime // Expiration date of the token
+  createdAt DateTime  @default(now())
+  isActive  Boolean   @default(true)
+}
+
+enum TokenType {
+  PASSWORD_RESET
+  ACCOUNT_VERIFICATION
+  ONE_TIME_LOGIN
+  DEACTIVATION
+}
 
 model UserLibrary {
-  id        Int         @id @default(autoincrement())
-  user      User        @relation(fields: [userId], references: [id])
-  userId    Int         @unique
+  id         Int         @id @default(autoincrement())
+  user       User        @relation(fields: [userId], references: [id])
+  userId     Int         @unique
   userPlants UserPlant[]
 }
 
 model UserPlant {
-  id              Int       @id @default(autoincrement())
-  library         UserLibrary @relation(fields: [libraryId], references: [id])
+  id              Int              @id @default(autoincrement())
+  library         UserLibrary      @relation(fields: [libraryId], references: [id])
   libraryId       Int
-  plant           Plant     @relation(fields: [plantId], references: [id])
-  plantId         Int
+  plant           Plant            @relation(fields: [plantId], references: [id])
+  plantId         Int              @unique
   nickname        String?
   acquiredDate    DateTime
   notes           String?
   photos          UserPlantPhoto[]
   wateringLogs    WateringLog[]
   fertilizingLogs FertilizingLog[]
-  room            Room?     @relation(fields: [roomId], references: [id])
+  room            Room?            @relation(fields: [roomId], references: [id]) // Belongs to a room
   roomId          Int?
 }
 
@@ -78,54 +97,55 @@ model UserPlantPhoto {
 }
 
 model Plant {
-  id              Int       @id @default(autoincrement())
-  name            String
-  scientificName  String    @unique
-  commonName      String
-  family          String
-  icon            String
-  light           String
-  temperature     String
-  soil            String
-  climate         String
-  humidity        String
-  growthCycle     String
-  toxicity        String
-  petSafe         Boolean
-  plantType       String
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  userPlants      UserPlant[]
+  id             Int        @id @default(autoincrement())
+  name           String
+  scientificName String     @unique
+  commonName     String
+  family         String
+  icon           String
+  light          String
+  temperature    String
+  soil           String
+  climate        String
+  humidity       String
+  growthCycle    String
+  toxicity       String
+  petSafe        Boolean
+  plantType      String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
   article        Article?
+  UserPlant      UserPlant?
 }
 
 model Article {
-  id              Int       @id @default(autoincrement())
-  title           String
-  content         String
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  author          User      @relation(fields: [authorId], references: [id])
-  authorId        Int
-  plant           Plant     @relation(fields: [plantId], references: [id])
-  plantId         Int
-  comments        Comment[]
-  changeRequests  ChangeRequest[]
+  id             Int             @id @default(autoincrement())
+  title          String
+  content        String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  plant          Plant           @relation(fields: [plantId], references: [id])
+  plantId        Int             @unique
+  contributors   User[]          @relation("ArticleContributors") // Allow multiple contributors
+  comments       Comment[]
+  changeRequests ChangeRequest[]
   discussions    Discussion[]
+  UserFlag       UserFlag[]
 }
 
 model Discussion {
-  id           Int      @id @default(autoincrement())
-  content      String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  author       User     @relation(fields: [authorId], references: [id])
-  authorId     Int
-  article      Article  @relation(fields: [articleId], references: [id])
-  articleId    Int
-  parentId     Int?
-  parent       Discussion? @relation("DiscussionReplies", fields: [parentId], references: [id])
-  replies      Discussion[] @relation("DiscussionReplies")
+  id        Int          @id @default(autoincrement())
+  content   String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  article   Article      @relation(fields: [articleId], references: [id])
+  articleId Int
+  author    User         @relation(fields: [authorId], references: [id]) // Author of the discussion
+  authorId  Int
+  parentId  Int?
+  parent    Discussion?  @relation("DiscussionReplies", fields: [parentId], references: [id])
+  replies   Discussion[] @relation("DiscussionReplies")
+  UserFlag  UserFlag[]
 }
 
 model Comment {
@@ -159,9 +179,9 @@ model FertilizingLog {
 }
 
 model WishlistPlant {
-  id        Int      @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   plantName String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User   @relation(fields: [userId], references: [id])
   userId    Int
 }
 
@@ -175,14 +195,14 @@ model GraveyardPlant {
 }
 
 model Room {
-  id        Int      @id @default(autoincrement())
-  name      String
-  type      RoomType
-  sunlight  String
-  humidity  String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  plants    Plant[]
+  id         Int         @id @default(autoincrement())
+  name       String
+  type       RoomType
+  sunlight   String
+  humidity   String
+  user       User        @relation(fields: [userId], references: [id])
+  userId     Int
+  userPlants UserPlant[]
 }
 
 enum RoomType {
@@ -196,12 +216,12 @@ enum RoomType {
 }
 
 model ModeratorRequest {
-  id           Int      @id @default(autoincrement())
-  user         User     @relation(fields: [userId], references: [id])
-  userId       Int
-  status       ModeratorRequestStatus @default(PENDING)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id        Int                    @id @default(autoincrement())
+  user      User                   @relation(fields: [userId], references: [id])
+  userId    Int
+  status    ModeratorRequestStatus @default(PENDING)
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
 }
 
 enum ModeratorRequestStatus {
@@ -210,16 +230,15 @@ enum ModeratorRequestStatus {
   REJECTED
 }
 
-
 model ChangeRequest {
-  id        Int      @id @default(autoincrement())
+  id        Int           @id @default(autoincrement())
   content   String
   status    RequestStatus @default(PENDING)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  author    User          @relation(fields: [authorId], references: [id])
   authorId  Int
-  article   Article  @relation(fields: [articleId], references: [id])
+  article   Article       @relation(fields: [articleId], references: [id])
   articleId Int
   approvals Approval[]
   flags     Flag[]
@@ -241,25 +260,25 @@ model Approval {
 }
 
 model UserFlag {
-  id          Int      @id @default(autoincrement())
-  reason      String
-  createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      Int
-  reviewer    User?    @relation("FlagReviewer", fields: [reviewerId], references: [id])
-  reviewerId  Int?
-  resolved    Boolean  @default(false)
-  resolvedAt  DateTime?
+  id                  Int         @id @default(autoincrement())
+  reason              String
+  createdAt           DateTime    @default(now())
+  user                User        @relation(fields: [userId], references: [id]) // User who flagged
+  userId              Int
+  flaggedArticle      Article?    @relation(fields: [flaggedArticleId], references: [id]) // Optional flagging of article
+  flaggedArticleId    Int?
+  flaggedDiscussion   Discussion? @relation(fields: [flaggedDiscussionId], references: [id]) // Optional flagging of discussion
+  flaggedDiscussionId Int?
+  resolved            Boolean     @default(false)
+  resolvedAt          DateTime?
 }
 
 model Flag {
-  id              Int           @id @default(autoincrement())
+  id              Int            @id @default(autoincrement())
   reason          String
-  createdAt       DateTime      @default(now())
-  changeRequest   ChangeRequest @relation(fields: [changeRequestId], references: [id])
-  changeRequestId Int
-  reviewer        User?         @relation(fields: [reviewerId], references: [id])
-  reviewerId      Int?
-  resolved        Boolean       @default(false)
+  createdAt       DateTime       @default(now())
+  flaggedChange   ChangeRequest? @relation(fields: [changeRequestId], references: [id])
+  changeRequestId Int?
+  resolved        Boolean        @default(false)
   resolvedAt      DateTime?
 }
