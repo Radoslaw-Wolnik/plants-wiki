@@ -1,20 +1,16 @@
-// File: src/app/api/moderator-requests/route.ts
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
-import { UnauthorizedError, BadRequestError, ForbiddenError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, BadRequestError, ForbiddenError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session?.user) {
       throw new UnauthorizedError();
     }
 
@@ -25,10 +21,18 @@ export async function POST(req: Request) {
       include: {
         _count: {
           select: {
-            plants: true,
             approvals: true,
           },
         },
+        library: {
+          select: {
+            _count: {
+              select: {
+                userPlants: true, // Count the number of plants in the user's library
+              },
+            },
+          },
+        }
       },
     });
 
@@ -39,7 +43,10 @@ export async function POST(req: Request) {
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-    if (user.createdAt > oneMonthAgo || user._count.plants < 3 || user._count.approvals < 5) {
+    if (user.library === null){
+      throw new ForbiddenError("You do not meet the requirements to become a moderator");
+    }
+    if (user.createdAt > oneMonthAgo || user.library._count.userPlants < 3 || user._count.approvals < 5) {
       throw new ForbiddenError("You do not meet the requirements to become a moderator");
     }
 
@@ -63,7 +70,7 @@ export async function POST(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in creating moderator request', { error });
+    logger.error('Unhandled error in creating moderator request', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
@@ -72,7 +79,7 @@ export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       throw new UnauthorizedError();
     }
 
@@ -86,10 +93,19 @@ export async function GET(req: Request) {
             createdAt: true,
             _count: {
               select: {
-                plants: true,
                 approvals: true,
               },
             },
+            // Include the user's library and count the number of plants
+            library: {
+              select: {
+                _count: {
+                  select: {
+                    userPlants: true, // Count the number of plants in the user's library
+                  },
+                },
+              },
+            }
           },
         },
       },
@@ -101,7 +117,7 @@ export async function GET(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in fetching moderator requests', { error });
+    logger.error('Unhandled error in fetching moderator requests', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
@@ -110,7 +126,7 @@ export async function PUT(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       throw new UnauthorizedError();
     }
 
@@ -149,7 +165,7 @@ export async function PUT(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in processing moderator request', { error });
+    logger.error('Unhandled error in processing moderator request', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
