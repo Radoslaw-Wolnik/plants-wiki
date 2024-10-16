@@ -38,6 +38,8 @@ model User {
   Deactivated       DateTime?
   lastActive        DateTime           @default(now())
   Discussion        Discussion[]
+  offeredTrades   TradeOffer[] @relation("OfferedTrades")
+  receivedTrades  TradeOffer[] @relation("ReceivedTrades")
 }
 
 enum UserRole {
@@ -85,6 +87,8 @@ model UserPlant {
   fertilizingLogs FertilizingLog[]
   room            Room?            @relation(fields: [roomId], references: [id]) // Belongs to a room
   roomId          Int?
+  offeredInTrades TradeOffer[] @relation("OfferedPlant")
+  requestedInTrades TradeOffer[] @relation("RequestedPlant")
 }
 
 model UserPlantPhoto {
@@ -281,4 +285,26 @@ model Flag {
   changeRequestId Int?
   resolved        Boolean        @default(false)
   resolvedAt      DateTime?
+}
+
+model TradeOffer {
+  id              Int       @id @default(autoincrement())
+  offerer         User      @relation("OfferedTrades", fields: [offererId], references: [id])
+  offererId       Int
+  recipient       User      @relation("ReceivedTrades", fields: [recipientId], references: [id])
+  recipientId     Int
+  offeredPlant    UserPlant @relation("OfferedPlant", fields: [offeredPlantId], references: [id])
+  offeredPlantId  Int
+  requestedPlant  UserPlant @relation("RequestedPlant", fields: [requestedPlantId], references: [id])
+  requestedPlantId Int
+  status          TradeStatus
+  message         String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+enum TradeStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
