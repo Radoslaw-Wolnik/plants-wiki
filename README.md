@@ -80,7 +80,8 @@ A comprehensive website for plant enthusiasts to share knowledge, manage their p
 
 2. Run database migrations:
    ```
-   docker-compose exec web npx prisma migrate deploy
+   ocker-compose exec app npx prisma migrate dev --name init
+   docker-compose exec app npx prisma migrate deploy
    ```
 
 The application should now be running at `http://localhost:3000`.
