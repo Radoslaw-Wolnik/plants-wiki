@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://testuser:testpass@db:5432/testdb
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=test_secret
+    depends_on:
+      - db
+    command: npm run test
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpass
+      - POSTGRES_DB=testdb
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_test_data:
