@@ -39,9 +39,14 @@ model User {
   Deactivated       DateTime?
   lastActive        DateTime           @default(now())
   Discussion        Discussion[]
-  offeredTrades   TradeOffer[] @relation("OfferedTrades")
-  receivedTrades  TradeOffer[] @relation("ReceivedTrades")
+  offeredTrades     TradeOffer[] @relation("OfferedTrades")
+  receivedTrades    TradeOffer[] @relation("ReceivedTrades")
   notifications     UserNotification[]
+  submittedPlants   PlantVerification[]
+  reviewedPlants    PlantVerification[] @relation("PlantVerificationReviewer")
+  careTips          CareTip[]
+  careTipLikes      CareTipLike[]
+  careTipFlags      CareTipFlag[]
 }
 
 enum UserRole {
@@ -80,7 +85,7 @@ model UserPlant {
   library         UserLibrary      @relation(fields: [libraryId], references: [id])
   libraryId       Int
   plant           Plant            @relation(fields: [plantId], references: [id])
-  plantId         Int              @unique
+  plantId         Int              @unique // not sure about this one as one user can have many of the same plant - even for trading necessary
   nickname        String?
   acquiredDate    DateTime
   notes           String?
@@ -121,7 +126,7 @@ model Plant {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   article        Article?
-  UserPlant      UserPlant?
+  careTips       CareTip[]
 }
 
 model Article {
@@ -327,4 +332,74 @@ enum NotificationType {
   ARTICLE_COMMENT
   CHANGE_REQUEST_APPROVED
   CHANGE_REQUEST_REJECTED
+}
+
+
+model PlantVerification {
+  id              Int       @id @default(autoincrement())
+  name            String
+  scientificName  String
+  commonName      String
+  family          String
+  icon            String
+  light           String
+  temperature     String
+  soil            String
+  climate         String
+  humidity        String
+  growthCycle     String
+  toxicity        String
+  petSafe         Boolean
+  plantType       String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  status          VerificationStatus @default(PENDING)
+  submittedBy     User      @relation(fields: [submittedById], references: [id])
+  submittedById   Int
+  reviewedBy      User?     @relation("PlantVerificationReviewer", fields: [reviewedById], references: [id])
+  reviewedById    Int?
+  reviewedAt      DateTime?
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model CareTip {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  plant     Plant    @relation(fields: [plantId], references: [id])
+  plantId   Int
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  likes     CareTipLike[]
+  flags     CareTipFlag[]
+}
+
+model CareTipLike {
+  id        Int      @id @default(autoincrement())
+  careTip   CareTip  @relation(fields: [careTipId], references: [id])
+  careTipId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+
+  @@unique([careTipId, userId])
+}
+
+model CareTipFlag {
+  id        Int      @id @default(autoincrement())
+  careTip   CareTip  @relation(fields: [careTipId], references: [id])
+  careTipId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  reason    String
+  createdAt DateTime @default(now())
+  resolved  Boolean  @default(false)
+  resolvedAt DateTime?
 }
