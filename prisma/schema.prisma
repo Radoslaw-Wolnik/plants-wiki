@@ -20,7 +20,8 @@ model User {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   tokens            Token[]
-  library           UserLibrary?
+  library           UserLibrary? @relation(fields: [libraryId], references: [id])
+  libraryId         Int?
   articles          Article[]          @relation("ArticleContributors")
   comments          Comment[]
   friends           User[]             @relation("UserFriends")
@@ -40,6 +41,7 @@ model User {
   Discussion        Discussion[]
   offeredTrades   TradeOffer[] @relation("OfferedTrades")
   receivedTrades  TradeOffer[] @relation("ReceivedTrades")
+  notifications     UserNotification[]
 }
 
 enum UserRole {
@@ -70,7 +72,7 @@ model UserLibrary {
   id         Int         @id @default(autoincrement())
   user       User        @relation(fields: [userId], references: [id])
   userId     Int         @unique
-  userPlants UserPlant[]
+  userPlants UserPlant[]?
 }
 
 model UserPlant {
@@ -307,4 +309,22 @@ enum TradeStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+model UserNotification {
+  id        Int      @id @default(autoincrement())
+  type      NotificationType
+  content   String
+  relatedId Int?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+}
+
+enum NotificationType {
+  FRIEND_REQUEST
+  ARTICLE_COMMENT
+  CHANGE_REQUEST_APPROVED
+  CHANGE_REQUEST_REJECTED
 }
