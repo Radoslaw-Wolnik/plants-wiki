@@ -11,21 +11,20 @@ datasource db {
 }
 
 model User {
-  id                Int                @id @default(autoincrement())
-  username          String             @unique
-  email             String             @unique
+  id                Int                 @id @default(autoincrement())
+  username          String              @unique
+  email             String              @unique
   password          String
   profilePicture    String?
-  role              UserRole           @default(USER)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  role              UserRole            @default(USER)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
   tokens            Token[]
-  library           UserLibrary? @relation(fields: [libraryId], references: [id])
-  libraryId         Int?
-  articles          Article[]          @relation("ArticleContributors")
+  library           UserLibrary?
+  articles          Article[]           @relation("ArticleContributors")
   comments          Comment[]
-  friends           User[]             @relation("UserFriends")
-  friendsOf         User[]             @relation("UserFriends")
+  friends           User[]              @relation("UserFriends")
+  friendsOf         User[]              @relation("UserFriends")
   wishlistPlants    WishlistPlant[]
   graveyardPlants   GraveyardPlant[]
   rooms             Room[] // userRooms
@@ -33,14 +32,14 @@ model User {
   approvals         Approval[]
   moderatorRequests ModeratorRequest[]
   flags             UserFlag[]
-  strikes           Int                @default(0)
-  isBanned          Boolean            @default(false)
+  strikes           Int                 @default(0)
+  isBanned          Boolean             @default(false)
   banExpiresAt      DateTime?
   Deactivated       DateTime?
-  lastActive        DateTime           @default(now())
+  lastActive        DateTime            @default(now())
   Discussion        Discussion[]
-  offeredTrades     TradeOffer[] @relation("OfferedTrades")
-  receivedTrades    TradeOffer[] @relation("ReceivedTrades")
+  offeredTrades     TradeOffer[]        @relation("OfferedTrades")
+  receivedTrades    TradeOffer[]        @relation("ReceivedTrades")
   notifications     UserNotification[]
   submittedPlants   PlantVerification[]
   reviewedPlants    PlantVerification[] @relation("PlantVerificationReviewer")
@@ -77,25 +76,25 @@ model UserLibrary {
   id         Int         @id @default(autoincrement())
   user       User        @relation(fields: [userId], references: [id])
   userId     Int         @unique
-  userPlants UserPlant[]?
+  userPlants UserPlant[]
 }
 
 model UserPlant {
-  id              Int              @id @default(autoincrement())
-  library         UserLibrary      @relation(fields: [libraryId], references: [id])
-  libraryId       Int
-  plant           Plant            @relation(fields: [plantId], references: [id])
-  plantId         Int              @unique // not sure about this one as one user can have many of the same plant - even for trading necessary
-  nickname        String?
-  acquiredDate    DateTime
-  notes           String?
-  photos          UserPlantPhoto[]
-  wateringLogs    WateringLog[]
-  fertilizingLogs FertilizingLog[]
-  room            Room?            @relation(fields: [roomId], references: [id]) // Belongs to a room
-  roomId          Int?
-  offeredInTrades TradeOffer[] @relation("OfferedPlant")
-  requestedInTrades TradeOffer[] @relation("RequestedPlant")
+  id                Int              @id @default(autoincrement())
+  library           UserLibrary      @relation(fields: [libraryId], references: [id])
+  libraryId         Int
+  plant             Plant            @relation(fields: [plantId], references: [id])
+  plantId           Int              @unique // not sure about this one as one user can have many of the same plant - even for trading necessary
+  nickname          String?
+  acquiredDate      DateTime
+  notes             String?
+  photos            UserPlantPhoto[]
+  wateringLogs      WateringLog[]
+  fertilizingLogs   FertilizingLog[]
+  room              Room?            @relation(fields: [roomId], references: [id]) // Belongs to a room
+  roomId            Int?
+  offeredInTrades   TradeOffer[]     @relation("OfferedPlant")
+  requestedInTrades TradeOffer[]     @relation("RequestedPlant")
 }
 
 model UserPlantPhoto {
@@ -127,6 +126,7 @@ model Plant {
   updatedAt      DateTime   @updatedAt
   article        Article?
   careTips       CareTip[]
+  UserPlant      UserPlant?
 }
 
 model Article {
@@ -295,19 +295,19 @@ model Flag {
 }
 
 model TradeOffer {
-  id              Int       @id @default(autoincrement())
-  offerer         User      @relation("OfferedTrades", fields: [offererId], references: [id])
-  offererId       Int
-  recipient       User      @relation("ReceivedTrades", fields: [recipientId], references: [id])
-  recipientId     Int
-  offeredPlant    UserPlant @relation("OfferedPlant", fields: [offeredPlantId], references: [id])
-  offeredPlantId  Int
-  requestedPlant  UserPlant @relation("RequestedPlant", fields: [requestedPlantId], references: [id])
+  id               Int         @id @default(autoincrement())
+  offerer          User        @relation("OfferedTrades", fields: [offererId], references: [id])
+  offererId        Int
+  recipient        User        @relation("ReceivedTrades", fields: [recipientId], references: [id])
+  recipientId      Int
+  offeredPlant     UserPlant   @relation("OfferedPlant", fields: [offeredPlantId], references: [id])
+  offeredPlantId   Int
+  requestedPlant   UserPlant   @relation("RequestedPlant", fields: [requestedPlantId], references: [id])
   requestedPlantId Int
-  status          TradeStatus
-  message         String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  status           TradeStatus
+  message          String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 }
 
 enum TradeStatus {
@@ -317,13 +317,13 @@ enum TradeStatus {
 }
 
 model UserNotification {
-  id        Int      @id @default(autoincrement())
+  id        Int              @id @default(autoincrement())
   type      NotificationType
   content   String
   relatedId Int?
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id])
   userId    Int
 }
 
@@ -334,31 +334,30 @@ enum NotificationType {
   CHANGE_REQUEST_REJECTED
 }
 
-
 model PlantVerification {
-  id              Int       @id @default(autoincrement())
-  name            String
-  scientificName  String
-  commonName      String
-  family          String
-  icon            String
-  light           String
-  temperature     String
-  soil            String
-  climate         String
-  humidity        String
-  growthCycle     String
-  toxicity        String
-  petSafe         Boolean
-  plantType       String
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  status          VerificationStatus @default(PENDING)
-  submittedBy     User      @relation(fields: [submittedById], references: [id])
-  submittedById   Int
-  reviewedBy      User?     @relation("PlantVerificationReviewer", fields: [reviewedById], references: [id])
-  reviewedById    Int?
-  reviewedAt      DateTime?
+  id             Int                @id @default(autoincrement())
+  name           String
+  scientificName String
+  commonName     String
+  family         String
+  icon           String
+  light          String
+  temperature    String
+  soil           String
+  climate        String
+  humidity       String
+  growthCycle    String
+  toxicity       String
+  petSafe        Boolean
+  plantType      String
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  status         VerificationStatus @default(PENDING)
+  submittedBy    User               @relation(fields: [submittedById], references: [id])
+  submittedById  Int
+  reviewedBy     User?              @relation("PlantVerificationReviewer", fields: [reviewedById], references: [id])
+  reviewedById   Int?
+  reviewedAt     DateTime?
 }
 
 enum VerificationStatus {
@@ -368,14 +367,14 @@ enum VerificationStatus {
 }
 
 model CareTip {
-  id        Int      @id @default(autoincrement())
+  id        Int           @id @default(autoincrement())
   title     String
   content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  plant     Plant    @relation(fields: [plantId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  plant     Plant         @relation(fields: [plantId], references: [id])
   plantId   Int
-  author    User     @relation(fields: [authorId], references: [id])
+  author    User          @relation(fields: [authorId], references: [id])
   authorId  Int
   likes     CareTipLike[]
   flags     CareTipFlag[]
@@ -393,13 +392,13 @@ model CareTipLike {
 }
 
 model CareTipFlag {
-  id        Int      @id @default(autoincrement())
-  careTip   CareTip  @relation(fields: [careTipId], references: [id])
-  careTipId Int
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  reason    String
-  createdAt DateTime @default(now())
-  resolved  Boolean  @default(false)
+  id         Int       @id @default(autoincrement())
+  careTip    CareTip   @relation(fields: [careTipId], references: [id])
+  careTipId  Int
+  user       User      @relation(fields: [userId], references: [id])
+  userId     Int
+  reason     String
+  createdAt  DateTime  @default(now())
+  resolved   Boolean   @default(false)
   resolvedAt DateTime?
 }
