@@ -15,15 +15,22 @@ services:
       - redis
     volumes:
       - ./public/uploads:/app/public/uploads
+    networks:
+      - plant-wiki-network
 
   db:
-    image: postgres:13
+    image: postgres:15
+    container_name: plant-wiki-postgres
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - plant-wiki-network
 
   redis:
     image: redis:6
@@ -31,8 +38,13 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - plant-wiki-network
 
 volumes:
   postgres_data:
   redis_data:
   uploads:
+
+networks:
+  plant-wiki-network:
