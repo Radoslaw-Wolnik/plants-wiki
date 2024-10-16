@@ -1,15 +1,10 @@
-// File: src/app/api/trades/route.ts
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
-import { UnauthorizedError, BadRequestError, NotFoundError, InternalServerError } from '@/lib/errors';
-import { checkUserBanStatus } from '@/lib/userModeration';
+import { UnauthorizedError, BadRequestError, NotFoundError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 const tradeOfferSchema = z.object({
   offeredPlantId: z.number().int().positive(),
@@ -17,11 +12,29 @@ const tradeOfferSchema = z.object({
   message: z.string().max(500).optional(),
 });
 
+async function checkUserBanStatus(userId: number) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isBanned: true, banExpiresAt: true },
+  });
+
+  if (user?.isBanned) {
+    if (user.banExpiresAt && user.banExpiresAt <= new Date()) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { isBanned: false, banExpiresAt: null },
+      });
+    } else {
+      throw new UnauthorizedError('User is banned');
+    }
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
 
@@ -50,10 +63,10 @@ export async function POST(req: Request) {
 
     const tradeOffer = await prisma.tradeOffer.create({
       data: {
-        offererId: parseInt(session.user.id),
-        recipientId: requestedPlant.library.userId,
-        offeredPlantId,
-        requestedPlantId,
+        offerer: { connect: { id: parseInt(session.user.id) } },
+        recipient: { connect: { id: requestedPlant.library.userId } },
+        offeredPlant: { connect: { id: offeredPlantId } },
+        requestedPlant: { connect: { id: requestedPlantId } },
         message,
         status: 'PENDING',
       },
@@ -68,7 +81,7 @@ export async function POST(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in creating trade offer', { error });
+    logger.error('Unhandled error in creating trade offer', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
@@ -77,7 +90,7 @@ export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
 
@@ -105,7 +118,7 @@ export async function GET(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in fetching trade offers', { error });
+    logger.error('Unhandled error in fetching trade offers', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
@@ -114,7 +127,7 @@ export async function PUT(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
 
@@ -141,19 +154,18 @@ export async function PUT(req: Request) {
     }
 
     if (action === 'accept') {
-      // Perform the trade
-      await prisma.$transaction(async (prisma) => {
-        await prisma.userPlant.update({
+      await prisma.$transaction(async (tx) => {
+        await tx.userPlant.update({
           where: { id: tradeOffer.offeredPlantId },
-          data: { libraryId: tradeOffer.recipientId },
+          data: { library: { connect: { userId: tradeOffer.recipientId } } },
         });
 
-        await prisma.userPlant.update({
+        await tx.userPlant.update({
           where: { id: tradeOffer.requestedPlantId },
-          data: { libraryId: tradeOffer.offererId },
+          data: { library: { connect: { userId: tradeOffer.offererId } } },
         });
 
-        await prisma.tradeOffer.update({
+        await tx.tradeOffer.update({
           where: { id: parseInt(tradeOfferId) },
           data: { status: 'ACCEPTED' },
         });
@@ -171,7 +183,7 @@ export async function PUT(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in processing trade offer', { error });
+    logger.error('Unhandled error in processing trade offer', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
