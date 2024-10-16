@@ -1,15 +1,11 @@
-// File: src/app/api/moderation/flags/route.ts
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
-import { UnauthorizedError, ForbiddenError, BadRequestError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, ForbiddenError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import { addStrike } from '@/lib/userModeration';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 const reviewFlagSchema = z.object({
   flagId: z.number().int().positive(),
@@ -20,8 +16,7 @@ const reviewFlagSchema = z.object({
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session || !['MODERATOR', 'ADMIN'].includes(session.user.role)) {
+    if (!session?.user || !['MODERATOR', 'ADMIN'].includes(session.user.role)) {
       throw new UnauthorizedError();
     }
 
@@ -35,7 +30,7 @@ export async function GET(req: Request) {
       prisma.flag.findMany({
         where: { resolved: false },
         include: {
-          changeRequest: {
+          flaggedChange: {
             include: {
               author: {
                 select: {
@@ -68,7 +63,7 @@ export async function GET(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in fetching unresolved flags', { error });
+    logger.error('Unhandled error in fetching unresolved flags', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
@@ -76,8 +71,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session || !['MODERATOR', 'ADMIN'].includes(session.user.role)) {
+    if (!session?.user || !['MODERATOR', 'ADMIN'].includes(session.user.role)) {
       throw new UnauthorizedError();
     }
 
@@ -87,7 +81,7 @@ export async function POST(req: Request) {
     const flag = await prisma.flag.findUnique({
       where: { id: flagId },
       include: {
-        changeRequest: {
+        flaggedChange: {
           include: {
             author: true,
           },
@@ -108,18 +102,17 @@ export async function POST(req: Request) {
       data: {
         resolved: true,
         resolvedAt: new Date(),
-        reviewerId: parseInt(session.user.id),
       },
     });
 
-    if (action === 'APPROVE') {
+    if (action === 'APPROVE' && flag.flaggedChange) {
       await prisma.changeRequest.update({
-        where: { id: flag.changeRequestId },
+        where: { id: flag.flaggedChange.id },
         data: { status: 'REJECTED' },
       });
 
       if (strikeUser) {
-        await addStrike(flag.changeRequest.authorId);
+        await addStrike(flag.flaggedChange.authorId);
       }
     }
 
@@ -132,7 +125,7 @@ export async function POST(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in reviewing flag', { error });
+    logger.error('Unhandled error in reviewing flag', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }

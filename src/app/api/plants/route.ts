@@ -1,16 +1,12 @@
-// File: src/app/api/plants/route.ts
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
 import { uploadFile } from '@/lib/fileUpload';
 import { checkUserBanStatus } from '@/lib/userModeration';
-import { UnauthorizedError, BadRequestError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 const plantSchema = z.object({
   name: z.string().min(1),
@@ -31,11 +27,9 @@ const plantSchema = z.object({
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session) {
+    if (!session?.user) {
       throw new UnauthorizedError();
     }
-
     await checkUserBanStatus(parseInt(session.user.id));
 
     const formData = await req.formData();
@@ -44,14 +38,12 @@ export async function POST(req: Request) {
     delete plantData.icon;
 
     const validatedData = plantSchema.parse(plantData);
-
     const iconUrl = await uploadFile(iconFile, ['image/jpeg', 'image/png', 'image/webp']);
 
     const plant = await prisma.plant.create({
       data: {
         ...validatedData,
         icon: iconUrl,
-        userId: parseInt(session.user.id),
       },
     });
 
@@ -64,7 +56,7 @@ export async function POST(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in plant creation', { error });
+    logger.error('Unhandled error in plant creation', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
