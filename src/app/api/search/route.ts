@@ -1,47 +1,64 @@
-// File: src/app/api/search/route.ts
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
-import { UnauthorizedError, BadRequestError, InternalServerError } from '@/lib/errors';
-import { checkUserBanStatus } from '@/lib/userModeration';
+import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 const searchSchema = z.object({
   query: z.string().min(1).max(100),
   type: z.enum(['ALL', 'PLANTS', 'ARTICLES', 'USERS']).default('ALL'),
 });
 
+// Implement the checkUserBanStatus function if it doesn't exist
+async function checkUserBanStatus(userId: number) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isBanned: true, banExpiresAt: true },
+  });
+
+  if (user?.isBanned) {
+    if (user.banExpiresAt && user.banExpiresAt <= new Date()) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { isBanned: false, banExpiresAt: null },
+      });
+    } else {
+      throw new UnauthorizedError('User is banned');
+    }
+  }
+}
+
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
-
     await checkUserBanStatus(parseInt(session.user.id));
 
     const { searchParams } = new URL(req.url);
     const { query, type } = searchSchema.parse(Object.fromEntries(searchParams));
 
-    let results = {
+    let results: {
+      plants: any[];
+      articles: any[];
+      users: any[];
+    } = {
       plants: [],
       articles: [],
       users: [],
     };
 
-    const searchOptions = {
+    const searchOptions: Prisma.PlantFindManyArgs = {
       where: {
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
           { scientificName: { contains: query, mode: 'insensitive' } },
           { commonName: { contains: query, mode: 'insensitive' } },
-        ],
+        ] as Prisma.PlantWhereInput[],
       },
       take: 10,
     };
@@ -88,7 +105,7 @@ export async function GET(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in search', { error });
+    logger.error('Unhandled error in search', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }

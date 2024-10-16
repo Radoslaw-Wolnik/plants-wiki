@@ -1,15 +1,11 @@
-// File: src/app/api/articles/route.ts
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
 import { checkUserBanStatus } from '@/lib/userModeration';
-import { UnauthorizedError, BadRequestError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 const articleSchema = z.object({
   title: z.string().min(1).max(200),
@@ -20,11 +16,9 @@ const articleSchema = z.object({
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
-
     await checkUserBanStatus(parseInt(session.user.id));
 
     const body = await req.json();
@@ -39,8 +33,12 @@ export async function POST(req: Request) {
       data: {
         title,
         content,
-        authorId: parseInt(session.user.id),
-        plantId,
+        contributors: {
+          connect: { id: parseInt(session.user.id) }
+        },
+        plant: {
+          connect: { id: plantId }
+        }
       },
     });
 
@@ -53,7 +51,7 @@ export async function POST(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in article creation', { error });
+    logger.error('Unhandled error in article creation', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }

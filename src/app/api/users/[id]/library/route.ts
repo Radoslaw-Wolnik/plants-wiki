@@ -1,19 +1,21 @@
-// File: src/app/api/users/[id]/library/route.ts
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
-import { UnauthorizedError, NotFoundError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, NotFoundError, InternalServerError, AppError } from '@/lib/errors';
+import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
-const prisma = new PrismaClient();
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
     const session = await getServerSession(authOptions);
-    const userId = parseInt(params.id);
+    if (!session?.user) {
+      throw new UnauthorizedError();
+    }
+    await checkUserBanStatus(parseInt(session.user.id));
 
+    const userId = parseInt(params.id);
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
@@ -70,30 +72,10 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
     const totalPages = Math.ceil(totalCount / limit);
 
-    // If it's the user's own library, include more details
-    if (session && userId === parseInt(session.user.id)) {
-      for (let userPlant of library.userPlants) {
-        const [lastWatering, lastFertilizing] = await Promise.all([
-          prisma.wateringLog.findFirst({
-            where: { userPlantId: userPlant.id },
-            orderBy: { date: 'desc' },
-            select: { date: true },
-          }),
-          prisma.fertilizingLog.findFirst({
-            where: { userPlantId: userPlant.id },
-            orderBy: { date: 'desc' },
-            select: { date: true },
-          }),
-        ]);
 
-        userPlant.lastWatering = lastWatering?.date;
-        userPlant.lastFertilizing = lastFertilizing?.date;
-      }
-    }
-
-    logger.info('User library fetched', { userId, page, limit, search });
+    logger.info('User library fetched', { userId: session.user.id, page, limit, search });
     return NextResponse.json({
-      library,
+      library: { ...library, userPlants: library.userPlants },
       pagination: {
         currentPage: page,
         totalPages,
@@ -104,7 +86,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in fetching user library', { error });
+    logger.error('Unhandled error in fetching user library', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }

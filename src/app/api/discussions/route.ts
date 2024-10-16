@@ -1,15 +1,11 @@
-// File: src/app/api/discussions/route.ts
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
-import { UnauthorizedError, BadRequestError, NotFoundError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, BadRequestError, NotFoundError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 const discussionSchema = z.object({
   content: z.string().min(1),
@@ -20,11 +16,9 @@ const discussionSchema = z.object({
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
-
     await checkUserBanStatus(parseInt(session.user.id));
 
     const body = await req.json();
@@ -38,9 +32,9 @@ export async function POST(req: Request) {
     const discussion = await prisma.discussion.create({
       data: {
         content,
-        authorId: parseInt(session.user.id),
-        articleId,
-        parentId,
+        author: { connect: { id: parseInt(session.user.id) } },
+        article: { connect: { id: articleId } },
+        parent: parentId ? { connect: { id: parentId } } : undefined,
       },
     });
 
@@ -53,7 +47,7 @@ export async function POST(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in creating discussion', { error });
+    logger.error('Unhandled error in creating discussion', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
@@ -61,14 +55,12 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
 
     const { searchParams } = new URL(req.url);
     const articleId = searchParams.get('articleId');
-
     if (!articleId) {
       throw new BadRequestError("Article ID must be provided");
     }
@@ -107,7 +99,7 @@ export async function GET(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in fetching discussions', { error });
+    logger.error('Unhandled error in fetching discussions', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }

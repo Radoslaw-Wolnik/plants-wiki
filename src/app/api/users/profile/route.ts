@@ -3,13 +3,11 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
-import { UnauthorizedError, NotFoundError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, NotFoundError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 const updateProfileSchema = z.object({
   username: z.string().min(3).max(20).optional(),
@@ -19,11 +17,9 @@ const updateProfileSchema = z.object({
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session) {
+    if (!session?.user) {
       throw new UnauthorizedError();
     }
-
     await checkUserBanStatus(parseInt(session.user.id));
 
     const user = await prisma.user.findUnique({
@@ -35,19 +31,21 @@ export async function GET(req: Request) {
         profilePicture: true,
         createdAt: true,
         role: true,
-        plants: {
-          select: {
-            id: true,
-            name: true,
-            icon: true,
-          },
-        },
         wishlistPlants: true,
         graveyardPlants: true,
         _count: {
           select: {
-            plants: true,
             friends: true,
+          },
+        },
+        // Include the user's library and count the number of plants
+        library: {
+          select: {
+            _count: {
+              select: {
+                userPlants: true, // Count the number of plants in the user's library
+              },
+            },
           },
         },
       },
@@ -63,7 +61,7 @@ export async function GET(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in fetching user profile', { error });
+    logger.error('Unhandled error in fetching user profile', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }

@@ -5,11 +5,10 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
-import { UnauthorizedError, BadRequestError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 const wishlistItemSchema = z.object({
   plantName: z.string().min(1).max(100),

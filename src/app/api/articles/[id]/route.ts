@@ -1,13 +1,9 @@
-// File: src/app/api/articles/[id]/route.ts
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
-import { NotFoundError, InternalServerError } from '@/lib/errors';
+import { NotFoundError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
@@ -17,7 +13,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     const article = await prisma.article.findUnique({
       where: { id: articleId },
       include: {
-        author: {
+        contributors: {
           select: {
             id: true,
             username: true,
@@ -51,8 +47,10 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       throw new NotFoundError("Article not found");
     }
 
+    let articleWithChangeRequests: any = { ...article };
+
     // If the user is logged in and is a moderator or admin, include change requests
-    if (session && ['MODERATOR', 'ADMIN'].includes(session.user.role)) {
+    if (session?.user && ['MODERATOR', 'ADMIN'].includes(session.user.role)) {
       const changeRequests = await prisma.changeRequest.findMany({
         where: { articleId },
         include: {
@@ -75,17 +73,16 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         },
         orderBy: { createdAt: 'desc' },
       });
-
-      article.changeRequests = changeRequests;
+      articleWithChangeRequests.changeRequests = changeRequests;
     }
 
-    logger.info('Article details fetched', { articleId, userId: session?.user.id });
-    return NextResponse.json(article);
+    logger.info('Article details fetched', { articleId, userId: session?.user?.id });
+    return NextResponse.json(articleWithChangeRequests);
   } catch (error) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in fetching article details', { error });
+    logger.error('Unhandled error in fetching article details', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }

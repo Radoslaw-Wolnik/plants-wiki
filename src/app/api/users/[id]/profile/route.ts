@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from "@prisma/client";
-import { NotFoundError, InternalServerError } from '@/lib/errors';
+import { NotFoundError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
@@ -17,17 +15,13 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         profilePicture: true,
         createdAt: true,
         role: true,
-        posts: {
+        articles: {
           orderBy: { createdAt: 'desc' },
           take: 10,
-          include: {
-            likes: true,
-            dislikes: true,
-          },
         },
         _count: {
           select: {
-            posts: true,
+            articles: true,
             friends: true,
           },
         },

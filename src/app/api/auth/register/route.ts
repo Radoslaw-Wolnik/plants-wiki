@@ -1,13 +1,9 @@
-// File: src/app/api/auth/register/route.ts
-
 import { NextResponse } from 'next/server';
-import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
-import { BadRequestError, ConflictError, InternalServerError } from '@/lib/errors';
+import { BadRequestError, ConflictError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 const userSchema = z.object({
   username: z.string().min(3).max(20),
@@ -53,7 +49,7 @@ export async function POST(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in user registration', { error });
+    logger.error('Unhandled error in user registration', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }

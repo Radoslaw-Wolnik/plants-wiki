@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { PrismaClient } from "@prisma/client";
-import { UnauthorizedError, ForbiddenError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, ForbiddenError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
 
 const prisma = new PrismaClient();
@@ -13,7 +13,7 @@ export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
 
@@ -84,7 +84,7 @@ export async function GET(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in fetching site statistics', { error });
+    logger.error('Unhandled error in fetching site statistics', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }

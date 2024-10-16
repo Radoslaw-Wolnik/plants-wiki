@@ -5,11 +5,11 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
-import { UnauthorizedError, BadRequestError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
-const prisma = new PrismaClient();
 
 const roomSchema = z.object({
   name: z.string().min(1).max(50),
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
     const rooms = await prisma.room.findMany({
       where: { userId: parseInt(session.user.id) },
       include: {
-        plants: {
+        userPlants: {
           select: {
             id: true,
             nickname: true,

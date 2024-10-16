@@ -1,15 +1,11 @@
-// File: src/app/api/users/notifications/route.ts
-
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
-import { UnauthorizedError, BadRequestError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 const notificationSchema = z.object({
   type: z.enum(['FRIEND_REQUEST', 'ARTICLE_COMMENT', 'CHANGE_REQUEST_APPROVED', 'CHANGE_REQUEST_REJECTED']),
@@ -21,13 +17,13 @@ export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
 
     await checkUserBanStatus(parseInt(session.user.id));
 
-    const notifications = await prisma.notification.findMany({
+    const notifications = await prisma.userNotification.findMany({
       where: { userId: parseInt(session.user.id) },
       orderBy: { createdAt: 'desc' },
     });
@@ -38,7 +34,7 @@ export async function GET(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in fetching user notifications', { error });
+    logger.error('Unhandled error in fetching user notifications', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
@@ -47,7 +43,7 @@ export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
 
@@ -56,7 +52,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { type, content, relatedId } = notificationSchema.parse(body);
 
-    const notification = await prisma.notification.create({
+    const notification = await prisma.userNotification.create({
       data: {
         type,
         content,
@@ -74,7 +70,7 @@ export async function POST(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in creating notification', { error });
+    logger.error('Unhandled error in creating notification', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
@@ -83,7 +79,7 @@ export async function PUT(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
 
@@ -96,7 +92,7 @@ export async function PUT(req: Request) {
       throw new BadRequestError("Notification ID is required");
     }
 
-    const notification = await prisma.notification.findUnique({
+    const notification = await prisma.userNotification.findUnique({
       where: { id: parseInt(notificationId) },
     });
 
@@ -104,7 +100,7 @@ export async function PUT(req: Request) {
       throw new BadRequestError("Notification not found or not owned by the user");
     }
 
-    const updatedNotification = await prisma.notification.update({
+    const updatedNotification = await prisma.userNotification.update({
       where: { id: parseInt(notificationId) },
       data: { read: true },
     });
@@ -115,7 +111,7 @@ export async function PUT(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in updating notification', { error });
+    logger.error('Unhandled error in updating notification', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }
@@ -124,7 +120,7 @@ export async function DELETE(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
 
@@ -137,7 +133,7 @@ export async function DELETE(req: Request) {
       throw new BadRequestError("Notification ID is required");
     }
 
-    const notification = await prisma.notification.findUnique({
+    const notification = await prisma.userNotification.findUnique({
       where: { id: parseInt(notificationId) },
     });
 
@@ -145,7 +141,7 @@ export async function DELETE(req: Request) {
       throw new BadRequestError("Notification not found or not owned by the user");
     }
 
-    await prisma.notification.delete({
+    await prisma.userNotification.delete({
       where: { id: parseInt(notificationId) },
     });
 
@@ -155,7 +151,7 @@ export async function DELETE(req: Request) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in deleting notification', { error });
+    logger.error('Unhandled error in deleting notification', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }

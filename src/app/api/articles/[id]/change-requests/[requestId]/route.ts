@@ -3,13 +3,11 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
-import { UnauthorizedError, BadRequestError, ForbiddenError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, BadRequestError, ForbiddenError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 const changeRequestSchema = z.object({
   content: z.string().min(1),
@@ -23,7 +21,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session || !session.user) {
       throw new UnauthorizedError();
     }
 
@@ -60,7 +58,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
-    logger.error('Unhandled error in fetching article change requests', { error });
+    logger.error('Unhandled error in fetching article change requests', { error: error instanceof Error ? error.message : String(error) });
     throw new InternalServerError();
   }
 }

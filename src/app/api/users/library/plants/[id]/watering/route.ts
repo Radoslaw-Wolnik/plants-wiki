@@ -6,10 +6,9 @@ import { authOptions } from "../../../../../auth/[...nextauth]/route";
 import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
 import { checkUserBanStatus } from '@/lib/userModeration';
-import { UnauthorizedError, BadRequestError, InternalServerError } from '@/lib/errors';
+import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 const wateringLogSchema = z.object({
   date: z.string().datetime(),
