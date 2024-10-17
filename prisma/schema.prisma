@@ -27,7 +27,7 @@ model User {
   friendsOf         User[]              @relation("UserFriends")
   wishlistPlants    WishlistPlant[]
   graveyardPlants   GraveyardPlant[]
-  rooms             Room[] // userRooms
+  rooms             Room[]              // userRooms
   changeRequests    ChangeRequest[]
   approvals         Approval[]
   moderatorRequests ModeratorRequest[]
@@ -57,10 +57,10 @@ enum UserRole {
 model Token {
   id        Int       @id @default(autoincrement())
   user      User      @relation(fields: [userId], references: [id])
-  userId    Int // Foreign key to User
+  userId    Int       // Foreign key to User
   token     String    @unique
   type      TokenType // Enum for token types
-  expiresAt DateTime // Expiration date of the token
+  expiresAt DateTime  // Expiration date of the token
   createdAt DateTime  @default(now())
   isActive  Boolean   @default(true)
 }
