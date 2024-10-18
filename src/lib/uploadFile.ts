@@ -13,6 +13,8 @@ type UploadType =
   | 'user-plant'
   | 'plant'
   | 'plant-icon'
+  | 'plant-verification'
+  | 'plant-verification-image'
   | 'article'
   | 'trade';
 
@@ -46,6 +48,12 @@ export async function uploadFile(
       break;
     case 'plant-icon':
       uploadDir = path.join(BASE_UPLOAD_DIR, 'plant-icons', id.toString());
+      break;
+    case 'plant-verification':
+      uploadDir = path.join(BASE_UPLOAD_DIR, 'plant-verifications', id.toString(), 'icons');
+      break;
+    case 'plant-verification-image':
+      uploadDir = path.join(BASE_UPLOAD_DIR, 'plant-verifications', id.toString(), 'images');
       break;
     case 'article':
       uploadDir = path.join(BASE_UPLOAD_DIR, 'articles', id.toString());

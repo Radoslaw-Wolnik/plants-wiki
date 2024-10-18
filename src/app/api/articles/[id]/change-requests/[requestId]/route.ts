@@ -25,7 +25,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const articleId = parseInt(params.id);
 
@@ -71,7 +71,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const articleId = parseInt(params.id);
     const body = await req.json();
@@ -88,7 +88,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     const changeRequest = await prisma.changeRequest.create({
       data: {
         content,
-        authorId: parseInt(session.user.id),
+        authorId: session.user.id,
         articleId,
       },
     });
@@ -140,7 +140,7 @@ export async function PUT(req: Request, { params }: { params: { id: string, requ
           status: action === 'APPROVE' ? 'APPROVED' : 'REJECTED',
           approvals: {
             create: {
-              moderatorId: parseInt(session.user.id),
+              moderatorId: session.user.id,
             },
           },
         },

@@ -6,13 +6,12 @@ import { UnauthorizedError, BadRequestError, InternalServerError } from '@/lib/e
 import prisma from '@/lib/prisma';
 import { checkUserBanStatus } from '@/lib/userModeration';
 
-export async function POST(req: Request) {
+export async function POST(req: Request, { params }: { params: { id: string } }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       throw new UnauthorizedError();
     }
-
     await checkUserBanStatus(session.user.id);
 
     // Check if the user has permission to upload global plant photos
@@ -23,7 +22,7 @@ export async function POST(req: Request) {
 
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const plantId = formData.get('plantId') as string;
+    const plantId = params.id;
     const description = formData.get('description') as string;
 
     if (!file || !plantId) {
@@ -37,7 +36,6 @@ export async function POST(req: Request) {
 
     const fileUrl = await uploadFile(file, 'plant', plantId);
 
-    // Assuming you have a PlantPhoto model in your schema
     const plantPhoto = await prisma.plantPhoto.create({
       data: {
         plantId: parseInt(plantId),

@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     delete plantData.icon;
 
     const validatedData = plantSchema.parse(plantData);
-    const iconUrl = await uploadFile(iconFile, ['image/jpeg', 'image/png', 'image/webp']);
+    const iconUrl = await uploadFile(iconFile, 'plant-icon', 'new');
 
     const plant = await prisma.plant.create({
       data: {

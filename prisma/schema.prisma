@@ -41,11 +41,13 @@ model User {
   offeredTrades     TradeOffer[]        @relation("OfferedTrades")
   receivedTrades    TradeOffer[]        @relation("ReceivedTrades")
   notifications     UserNotification[]
-  submittedPlants   PlantVerification[]
-  reviewedPlants    PlantVerification[] @relation("PlantVerificationReviewer")
+  submittedPlants   PlantVerification[] @relation("SubmittedVerifications")
+  reviewedPlants    PlantVerification[] @relation("ReviewedVerifications")
   careTips          CareTip[]
   careTipLikes      CareTipLike[]
   careTipFlags      CareTipFlag[]
+  uploadedPlantPhotos   PlantPhoto[]
+  uploadedArticlePhotos ArticlePhoto[]
 }
 
 enum UserRole {
@@ -126,7 +128,8 @@ model Plant {
   updatedAt      DateTime   @updatedAt
   article        Article?
   careTips       CareTip[]
-  UserPlant      UserPlant?
+  photos      PlantPhoto[]
+  UserPlant     UserPlant?
 }
 
 model Article {
@@ -142,6 +145,7 @@ model Article {
   changeRequests ChangeRequest[]
   discussions    Discussion[]
   UserFlag       UserFlag[]
+  photos      ArticlePhoto[]
 }
 
 model Discussion {
@@ -341,6 +345,7 @@ model PlantVerification {
   commonName     String
   family         String
   icon           String
+  image          String
   light          String
   temperature    String
   soil           String
@@ -350,13 +355,13 @@ model PlantVerification {
   toxicity       String
   petSafe        Boolean
   plantType      String
+  status         VerificationStatus @default(PENDING)
+  submittedBy    User               @relation("SubmittedVerifications", fields: [submittedById], references: [id])
+  submittedById  Int
+  reviewedBy     User?              @relation("ReviewedVerifications", fields: [reviewedById], references: [id])
+  reviewedById   Int?
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
-  status         VerificationStatus @default(PENDING)
-  submittedBy    User               @relation(fields: [submittedById], references: [id])
-  submittedById  Int
-  reviewedBy     User?              @relation("PlantVerificationReviewer", fields: [reviewedById], references: [id])
-  reviewedById   Int?
   reviewedAt     DateTime?
 }
 
@@ -401,4 +406,29 @@ model CareTipFlag {
   createdAt  DateTime  @default(now())
   resolved   Boolean   @default(false)
   resolvedAt DateTime?
+}
+
+
+model PlantPhoto {
+  id          Int      @id @default(autoincrement())
+  plant       Plant    @relation(fields: [plantId], references: [id])
+  plantId     Int
+  url         String
+  description String?
+  uploadedBy  User     @relation(fields: [uploadedById], references: [id])
+  uploadedById Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ArticlePhoto {
+  id          Int      @id @default(autoincrement())
+  article     Article  @relation(fields: [articleId], references: [id])
+  articleId   Int
+  url         String
+  caption     String?
+  uploadedBy  User     @relation(fields: [uploadedById], references: [id])
+  uploadedById Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

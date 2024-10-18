@@ -12,7 +12,6 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     if (!session?.user) {
       throw new UnauthorizedError();
     }
-
     await checkUserBanStatus(session.user.id);
 
     const articleId = parseInt(params.id);
@@ -24,7 +23,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       throw new BadRequestError('No file provided');
     }
 
-    const article = await prisma.article.findUnique({ 
+    const article = await prisma.article.findUnique({
       where: { id: articleId },
       include: { contributors: true }
     });
@@ -33,14 +32,12 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       throw new BadRequestError('Article not found');
     }
 
-    // Check if the user is a contributor to the article
     if (!article.contributors.some(contributor => contributor.id === session.user.id)) {
       throw new UnauthorizedError('You do not have permission to upload photos to this article');
     }
 
-    const fileUrl = await uploadFile(file, 'article', articleId);
+    const fileUrl = await uploadFile(file, 'article', articleId.toString());
 
-    // Assuming you have an ArticlePhoto model in your schema
     const articlePhoto = await prisma.articlePhoto.create({
       data: {
         articleId,
