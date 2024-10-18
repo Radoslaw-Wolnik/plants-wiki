@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { NotFoundError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
 import prisma from '@/lib/prisma';

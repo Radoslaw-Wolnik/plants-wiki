@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { uploadFile } from '@/lib/uploadFile';
 import { checkUserBanStatus } from '@/lib/userModeration';
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     if (!session?.user) {
       throw new UnauthorizedError();
     }
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const formData = await req.formData();
     const iconFile = formData.get('icon') as File;
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       data: {
         ...validatedData,
         icon: iconUrl,
-        submittedById: parseInt(session.user.id),
+        submittedById: session.user.id,
       },
     });
 
@@ -81,7 +81,7 @@ export async function PUT(req: Request) {
       where: { id },
       data: {
         status,
-        reviewedById: parseInt(session.user.id),
+        reviewedById: session.user.id,
         reviewedAt: new Date(),
       },
     });

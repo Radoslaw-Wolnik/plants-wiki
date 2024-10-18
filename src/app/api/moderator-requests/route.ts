@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { UnauthorizedError, BadRequestError, ForbiddenError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
@@ -14,10 +14,10 @@ export async function POST(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const user = await prisma.user.findUnique({
-      where: { id: parseInt(session.user.id) },
+      where: { id: session.user.id },
       include: {
         _count: {
           select: {

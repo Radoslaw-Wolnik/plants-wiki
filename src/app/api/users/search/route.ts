@@ -2,8 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
+import { authOptions } from '@/lib/auth';
 import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
@@ -17,7 +16,7 @@ export async function GET(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const { searchParams } = new URL(req.url);
     const query = searchParams.get('q');

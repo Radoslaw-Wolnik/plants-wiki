@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../../../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
@@ -22,7 +22,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const userPlantId = parseInt(params.id);
     const body = await req.json();
@@ -33,7 +33,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       include: { library: true },
     });
 
-    if (!userPlant || userPlant.library.userId !== parseInt(session.user.id)) {
+    if (!userPlant || userPlant.library.userId !== session.user.id) {
       throw new BadRequestError("User plant not found or not owned by the user");
     }
 

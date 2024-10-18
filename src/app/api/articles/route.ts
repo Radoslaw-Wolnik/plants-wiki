@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     if (!session || !session.user) {
       throw new UnauthorizedError();
     }
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const body = await req.json();
     const { title, content, plantId } = articleSchema.parse(body);
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         title,
         content,
         contributors: {
-          connect: { id: parseInt(session.user.id) }
+          connect: { id: session.user.id }
         },
         plant: {
           connect: { id: plantId }

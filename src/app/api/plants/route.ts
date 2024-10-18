@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { uploadFile } from '@/lib/uploadFile';
 import { checkUserBanStatus } from '@/lib/userModeration';
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     if (!session?.user) {
       throw new UnauthorizedError();
     }
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const formData = await req.formData();
     const iconFile = formData.get('icon') as File;

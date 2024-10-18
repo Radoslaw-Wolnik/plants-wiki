@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
 import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
@@ -24,10 +24,10 @@ export async function GET(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const graveyardItems = await prisma.graveyardPlant.findMany({
-      where: { userId: parseInt(session.user.id) },
+      where: { userId: session.user.id },
       orderBy: { endDate: 'desc' },
     });
 
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const body = await req.json();
     const { plantName, startDate, endDate } = graveyardItemSchema.parse(body);
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
         plantName,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
-        userId: parseInt(session.user.id),
+        userId: session.user.id,
       },
     });
 
@@ -86,7 +86,7 @@ export async function DELETE(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const { searchParams } = new URL(req.url);
     const itemId = searchParams.get('id');
@@ -99,7 +99,7 @@ export async function DELETE(req: Request) {
       where: { id: parseInt(itemId) },
     });
 
-    if (!graveyardItem || graveyardItem.userId !== parseInt(session.user.id)) {
+    if (!graveyardItem || graveyardItem.userId !== session.user.id) {
       throw new BadRequestError("Graveyard item not found or not owned by the user");
     }
 

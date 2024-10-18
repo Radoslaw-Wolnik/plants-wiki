@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { UnauthorizedError, BadRequestError, NotFoundError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     if (!session || !session.user) {
       throw new UnauthorizedError();
     }
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const body = await req.json();
     const { content, articleId, parentId } = discussionSchema.parse(body);
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     const discussion = await prisma.discussion.create({
       data: {
         content,
-        author: { connect: { id: parseInt(session.user.id) } },
+        author: { connect: { id: session.user.id } },
         article: { connect: { id: articleId } },
         parent: parentId ? { connect: { id: parentId } } : undefined,
       },

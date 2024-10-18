@@ -2,8 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
@@ -22,10 +21,10 @@ export async function GET(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const wishlistItems = await prisma.wishlistPlant.findMany({
-      where: { userId: parseInt(session.user.id) },
+      where: { userId: session.user.id },
       orderBy: { id: 'desc' },
     });
 
@@ -48,7 +47,7 @@ export async function POST(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const body = await req.json();
     const { plantName } = wishlistItemSchema.parse(body);
@@ -56,7 +55,7 @@ export async function POST(req: Request) {
     const wishlistItem = await prisma.wishlistPlant.create({
       data: {
         plantName,
-        userId: parseInt(session.user.id),
+        userId: session.user.id,
       },
     });
 
@@ -82,7 +81,7 @@ export async function DELETE(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const { searchParams } = new URL(req.url);
     const itemId = searchParams.get('id');
@@ -95,7 +94,7 @@ export async function DELETE(req: Request) {
       where: { id: parseInt(itemId) },
     });
 
-    if (!wishlistItem || wishlistItem.userId !== parseInt(session.user.id)) {
+    if (!wishlistItem || wishlistItem.userId !== session.user.id) {
       throw new BadRequestError("Wishlist item not found or not owned by the user");
     }
 

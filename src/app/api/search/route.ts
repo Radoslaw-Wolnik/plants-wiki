@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
@@ -37,7 +37,7 @@ export async function GET(req: Request) {
     if (!session || !session.user) {
       throw new UnauthorizedError();
     }
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const { searchParams } = new URL(req.url);
     const { query, type } = searchSchema.parse(Object.fromEntries(searchParams));

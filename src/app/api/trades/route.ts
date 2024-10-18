@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { UnauthorizedError, BadRequestError, NotFoundError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const body = await req.json();
     const { offeredPlantId, requestedPlantId, message } = tradeOfferSchema.parse(body);
@@ -53,17 +53,17 @@ export async function POST(req: Request) {
       include: { library: true },
     });
 
-    if (!offeredPlant || offeredPlant.library.userId !== parseInt(session.user.id)) {
+    if (!offeredPlant || offeredPlant.library.userId !== session.user.id) {
       throw new BadRequestError("Offered plant not found or not owned by you");
     }
 
-    if (!requestedPlant || requestedPlant.library.userId === parseInt(session.user.id)) {
+    if (!requestedPlant || requestedPlant.library.userId === session.user.id) {
       throw new BadRequestError("Requested plant not found or owned by you");
     }
 
     const tradeOffer = await prisma.tradeOffer.create({
       data: {
-        offerer: { connect: { id: parseInt(session.user.id) } },
+        offerer: { connect: { id: session.user.id } },
         recipient: { connect: { id: requestedPlant.library.userId } },
         offeredPlant: { connect: { id: offeredPlantId } },
         requestedPlant: { connect: { id: requestedPlantId } },
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
       },
     });
 
-    logger.info('Trade offer created', { tradeOfferId: tradeOffer.id, offererId: session.user.id, recipientId: requestedPlant.library.userId });
+    logger.info('Trade offer created', { tradeOfferId: tradeOffer.id, userid: session.user.id, recipientId: requestedPlant.library.userId });
     return NextResponse.json(tradeOffer, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -94,13 +94,13 @@ export async function GET(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const tradeOffers = await prisma.tradeOffer.findMany({
       where: {
         OR: [
-          { offererId: parseInt(session.user.id) },
-          { recipientId: parseInt(session.user.id) },
+          { offererId: session.user.id },
+          { recipientId: session.user.id },
         ],
       },
       include: {
@@ -112,7 +112,7 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    logger.info('Trade offers fetched', { userId: session.user.id });
+    logger.info('Trade offers fetched', {userid: session.user.id});
     return NextResponse.json(tradeOffers);
   } catch (error) {
     if (error instanceof AppError) {
@@ -131,7 +131,7 @@ export async function PUT(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const { searchParams } = new URL(req.url);
     const tradeOfferId = searchParams.get('id');
@@ -145,7 +145,7 @@ export async function PUT(req: Request) {
       where: { id: parseInt(tradeOfferId) },
     });
 
-    if (!tradeOffer || tradeOffer.recipientId !== parseInt(session.user.id)) {
+    if (!tradeOffer || tradeOffer.recipientId !== session.user.id) {
       throw new NotFoundError("Trade offer not found or you're not the recipient");
     }
 
@@ -177,7 +177,7 @@ export async function PUT(req: Request) {
       });
     }
 
-    logger.info('Trade offer processed', { tradeOfferId, action, userId: session.user.id });
+    logger.info('Trade offer processed', { tradeOfferId, action, userID: session.user.id});
     return NextResponse.json({ message: `Trade offer ${action}ed successfully` });
   } catch (error) {
     if (error instanceof AppError) {

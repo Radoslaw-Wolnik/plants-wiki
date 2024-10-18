@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { PrismaClient } from "@prisma/client";
 import { z } from 'zod';
 import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
@@ -22,10 +22,10 @@ export async function GET(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const friends = await prisma.user.findUnique({
-      where: { id: parseInt(session.user.id) },
+      where: { id: session.user.id },
       select: {
         friends: {
           select: {
@@ -56,12 +56,12 @@ export async function POST(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const body = await req.json();
     const { friendId } = friendRequestSchema.parse(body);
 
-    if (friendId === parseInt(session.user.id)) {
+    if (friendId === session.user.id) {
       throw new BadRequestError("You cannot add yourself as a friend");
     }
 
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     }
 
     const updatedUser = await prisma.user.update({
-      where: { id: parseInt(session.user.id) },
+      where: { id: session.user.id },
       data: {
         friends: {
           connect: { id: friendId },
@@ -114,7 +114,7 @@ export async function DELETE(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const { searchParams } = new URL(req.url);
     const friendId = searchParams.get('id');
@@ -124,7 +124,7 @@ export async function DELETE(req: Request) {
     }
 
     await prisma.user.update({
-      where: { id: parseInt(session.user.id) },
+      where: { id: session.user.id },
       data: {
         friends: {
           disconnect: { id: parseInt(friendId) },

@@ -1,7 +1,7 @@
 // File: src/app/api/users/[id]/library/route.ts
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { UnauthorizedError, NotFoundError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     if (!session?.user) {
       throw new UnauthorizedError();
     }
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
     const skip = (page - 1) * limit;
 
     const library = await prisma.userLibrary.findUnique({
-      where: { userId: parseInt(session.user.id) },
+      where: { userId: session.user.id },
       include: {
         userPlants: {
           where: {

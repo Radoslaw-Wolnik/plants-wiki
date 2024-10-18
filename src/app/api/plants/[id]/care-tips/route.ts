@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { UnauthorizedError, BadRequestError, NotFoundError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
@@ -20,7 +20,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     if (!session?.user) {
       throw new UnauthorizedError();
     }
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const plantId = parseInt(params.id);
     const careTips = await prisma.careTip.findMany({
@@ -49,7 +49,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     if (!session?.user) {
       throw new UnauthorizedError();
     }
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const plantId = parseInt(params.id);
     const body = await req.json();
@@ -68,7 +68,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         title,
         content,
         plantId,
-        authorId: parseInt(session.user.id),
+        authorId: session.user.id,
       },
     });
 
@@ -93,7 +93,7 @@ export async function PUT(req: Request, { params }: { params: { id: string, tipI
     if (!session?.user) {
       throw new UnauthorizedError();
     }
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const careTipId = parseInt(params.tipId);
 
@@ -101,7 +101,7 @@ export async function PUT(req: Request, { params }: { params: { id: string, tipI
       where: {
         careTipId_userId: {
           careTipId,
-          userId: parseInt(session.user.id),
+          userId: session.user.id,
         },
       },
     });
@@ -116,7 +116,7 @@ export async function PUT(req: Request, { params }: { params: { id: string, tipI
       await prisma.careTipLike.create({
         data: {
           careTipId,
-          userId: parseInt(session.user.id),
+          userId: session.user.id,
         },
       });
       logger.info('Care tip liked', { careTipId, userId: session.user.id });
@@ -138,7 +138,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string, ti
     if (!session?.user) {
       throw new UnauthorizedError();
     }
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const careTipId = parseInt(params.tipId);
     const body = await req.json();
@@ -147,7 +147,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string, ti
     const flag = await prisma.careTipFlag.create({
       data: {
         careTipId,
-        userId: parseInt(session.user.id),
+        userId: session.user.id,
         reason,
       },
     });

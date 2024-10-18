@@ -5,7 +5,7 @@ export interface User {
   username: string;
   email: string;
   password: string;
-  profilePicture?: string;
+  profilePicture: string | null;
   role: UserRole;
   createdAt: Date;
   updatedAt: Date;
@@ -140,3 +140,18 @@ export interface Token {
   createdAt: Date;
   isActive: boolean;
 }
+
+export type SafeUser = Omit<User, 'password' | 'tokens'>;
+export type PublicUser = Pick<User, 'id' | 'username' | 'profilePicture' | 'role'>;
+
+export interface SessionUser extends SafeUser {
+  id: number;
+  email: string;
+  username: string;
+  role: UserRole;
+}
+
+export type AuthToken = {
+  token: string;
+  expiresAt: Date;
+};

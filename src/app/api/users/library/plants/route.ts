@@ -2,8 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
@@ -25,13 +24,13 @@ export async function POST(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const body = await req.json();
     const { plantId, nickname, roomId, notes } = addPlantSchema.parse(body);
 
     const user = await prisma.user.findUnique({
-      where: { id: parseInt(session.user.id) },
+      where: { id: session.user.id },
       include: { library: true },
     });
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
@@ -21,10 +21,10 @@ export async function GET(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const notifications = await prisma.userNotification.findMany({
-      where: { userId: parseInt(session.user.id) },
+      where: { userId: session.user.id },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const body = await req.json();
     const { type, content, relatedId } = notificationSchema.parse(body);
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
         type,
         content,
         relatedId,
-        userId: parseInt(session.user.id),
+        userId: session.user.id,
       },
     });
 
@@ -83,7 +83,7 @@ export async function PUT(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const { searchParams } = new URL(req.url);
     const notificationId = searchParams.get('id');
@@ -96,7 +96,7 @@ export async function PUT(req: Request) {
       where: { id: parseInt(notificationId) },
     });
 
-    if (!notification || notification.userId !== parseInt(session.user.id)) {
+    if (!notification || notification.userId !== session.user.id) {
       throw new BadRequestError("Notification not found or not owned by the user");
     }
 
@@ -124,7 +124,7 @@ export async function DELETE(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const { searchParams } = new URL(req.url);
     const notificationId = searchParams.get('id');
@@ -137,7 +137,7 @@ export async function DELETE(req: Request) {
       where: { id: parseInt(notificationId) },
     });
 
-    if (!notification || notification.userId !== parseInt(session.user.id)) {
+    if (!notification || notification.userId !== session.user.id) {
       throw new BadRequestError("Notification not found or not owned by the user");
     }
 

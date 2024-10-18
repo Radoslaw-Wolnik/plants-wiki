@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { PrismaClient } from "@prisma/client";
 import { UnauthorizedError, InternalServerError, BadRequestError, AppError } from '@/lib/errors';
 import { checkUserBanStatus } from '@/lib/userModeration';
@@ -17,7 +17,7 @@ export async function GET(req: Request) {
       throw new UnauthorizedError();
     }
 
-    await checkUserBanStatus(parseInt(session.user.id));
+    await checkUserBanStatus(session.user.id);
 
     const { searchParams } = new URL(req.url);
     const startDate = searchParams.get('startDate');
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
         where: {
           userPlant: {
             library: {
-              userId: parseInt(session.user.id),
+              userId: session.user.id,
             },
           },
           date: {
@@ -52,7 +52,7 @@ export async function GET(req: Request) {
         where: {
           userPlant: {
             library: {
-              userId: parseInt(session.user.id),
+              userId: session.user.id,
             },
           },
           date: {
