@@ -33,10 +33,16 @@ EXPOSE 3000
 # Create a directory for logs
 RUN mkdir -p /app/logs
 
-# Create uploads directory
-RUN mkdir -p public/uploads
+# Create directories for logs and uploads
+RUN mkdir -p /app/logs \
+    && mkdir -p /app/public/uploads/users \
+    && mkdir -p /app/public/uploads/plants \
+    && mkdir -p /app/public/uploads/userplants \
+    && mkdir -p /app/public/uploads/plant-icons \
+    && mkdir -p /app/public/uploads/articles \
+    && mkdir -p /app/public/uploads/trades
 
-# Set permissions for the logs directory
-RUN chmod 777 /app/logs
+# Set permissions for the logs and uploads directories
+RUN chmod -R 755 /app/logs /app/public/uploads
 
 CMD ["npm", "start"]
