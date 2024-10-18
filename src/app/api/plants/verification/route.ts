@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { z } from 'zod';
-import { uploadFile } from '@/lib/fileUpload';
+import { uploadFile } from '@/lib/uploadFile';
 import { checkUserBanStatus } from '@/lib/userModeration';
 import { UnauthorizedError, BadRequestError, InternalServerError, AppError } from '@/lib/errors';
 import logger from '@/lib/logger';
