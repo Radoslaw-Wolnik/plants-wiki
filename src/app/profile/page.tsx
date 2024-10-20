@@ -1,9 +1,9 @@
 // src/pages/profile/page.tsx
 
 import React, { useState, useEffect } from 'react';
-import Layout from '../../components/Layout';
-import UserInfo from '../../components/UserInfo';
-import Achievements from '../../components/Achievements';
+import Layout from '@/components/Layout';
+import UserInfo from '@/components/UserInfo';
+import Achievements from '@/components/Achievements';
 import Link from 'next/link';
 
 const UserProfilePage: React.FC = () => {

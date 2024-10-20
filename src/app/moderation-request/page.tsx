@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import Layout from '../components/Layout';
+import Layout from '@/components/Layout';
 
 interface UserStats {
   approvedChanges: number;

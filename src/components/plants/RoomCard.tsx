@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card, Button } from '../common';
-import { Room } from '../../types';
+import { Room } from '@/types/global';
 
 interface RoomCardProps {
   room: Room;

@@ -2,8 +2,8 @@ import { writeFile } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import sharp from 'sharp';
-import { BadRequestError } from './errors';
-import logger from './logger';
+import { BadRequestError } from '@/lib/errors';
+import logger from '@/lib/logger';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
 

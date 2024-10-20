@@ -1,9 +1,9 @@
 // src/pages/moderation/dashboard/page.tsx
 
 import React, { useState, useEffect } from 'react';
-import Layout from '../../components/Layout';
-import ChangeRequestList from '../../components/ChangeRequestList';
-import FlaggedContentList from '../../components/FlaggedContentList';
+import Layout from '@/components/Layout';
+import ChangeRequestList from '@/components/ChangeRequestList';
+import FlaggedContentList from '@/components/FlaggedContentList';
 import { useSession } from 'next-auth/react';
 
 const ModerationDashboard: React.FC = () => {

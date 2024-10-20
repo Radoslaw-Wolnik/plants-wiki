@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card } from '../common';
-import { formatDate } from '../../utils';
+import { formatDate } from '@/utils/general.util';
 
 interface Discussion {
   id: number;

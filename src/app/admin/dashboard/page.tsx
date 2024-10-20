@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import Layout from '../../components/Layout';
-import StatCard from '../../components/StatCard';
-import UserManagement from '../../components/UserManagement';
+import Layout from '@/components/Layout';
+import StatCard from '@/components/StatCard';
+import UserManagement from '@/components/UserManagement';
 
 const AdminDashboard: React.FC = () => {
   const { data: session } = useSession();

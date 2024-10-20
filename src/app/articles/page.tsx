@@ -6,7 +6,7 @@ import Link from 'next/link';
 async function getArticles() {
   // In a real app, this would be an API call
   return [
-    { id: 1, title: 'Top 10 Houseplants for Beginners', excerpt: 'If you're new to plant parenthood...' },
+    { id: 1, title: 'Top 10 Houseplants for Beginners', excerpt: 'If you\'re new to plant parenthood...' },
     { id: 2, title: 'Understanding Plant Light Requirements', excerpt: 'Light is one of the most crucial factors...' },
     // ... more articles
   ];

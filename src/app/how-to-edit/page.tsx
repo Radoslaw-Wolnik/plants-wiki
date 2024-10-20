@@ -1,7 +1,7 @@
 // src/app/how-to-edit/page.tsx
 
 import React from 'react';
-import Layout from '../components/Layout';
+import Layout from '@/components/Layout';
 
 const HowToEditPage: React.FC = () => {
   return (

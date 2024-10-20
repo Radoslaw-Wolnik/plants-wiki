@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import Layout from '../../components/Layout';
-import TradeListingCard from '../../components/TradeListingCard';
-import UserPlantSelector from '../../components/UserPlantSelector';
+import Layout from '@/components/Layout';
+import TradeListingCard from '@/components/TradeListingCard';
+import UserPlantSelector from '@/components/UserPlantSelector';
 
 const TradeProposalPage: React.FC = () => {
   const router = useRouter();

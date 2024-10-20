@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Card from '../common/Card';
-import { Plant } from '../../types';
+import { Plant } from '@/types/global';
 
 interface PlantCardProps {
   plant: Plant;

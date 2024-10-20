@@ -2,7 +2,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import logger from './logger';
+import logger from '@/lib/logger';
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,

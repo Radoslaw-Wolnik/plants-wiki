@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Layout from '../../components/Layout';
-import DiscussionThread from '../../components/DiscussionThread';
-import CommentForm from '../../components/CommentForm';
+import Layout from '@/components/Layout';
+import DiscussionThread from '@/components/DiscussionThread';
+import CommentForm from '@/components/CommentForm';
 
 const DiscussionForumPage: React.FC = () => {
   const router = useRouter();

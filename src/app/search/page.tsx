@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Layout from '../components/Layout';
-import SearchResults from '../components/SearchResults';
+import Layout from '@/components/Layout';
+import SearchResults from '@/components/SearchResults';
 
 const SearchPage: React.FC = () => {
   const router = useRouter();

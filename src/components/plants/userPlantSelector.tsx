@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { PlantSelector } from '../common';
-import { Plant } from '../../types';
+import { Plant } from '@/types/global';
 
 interface UserPlantSelectorProps {
   onSelect: (plant: Plant | null) => void;

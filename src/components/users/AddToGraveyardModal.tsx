@@ -1,7 +1,7 @@
 // src/components/users/AddToGraveyardModal.tsx
 
 import React, { useState } from 'react';
-import Modal from './Modal';
+import Modal from '../common/Modal';
 
 interface AddToGraveyardModalProps {
   isOpen: boolean;

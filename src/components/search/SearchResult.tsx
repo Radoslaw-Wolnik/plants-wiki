@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card } from '../common';
-import { Plant, Article, User } from '../../types';
+import { Plant, Article, User } from '@/types/global';
 
 interface SearchResultsProps {
   results: {

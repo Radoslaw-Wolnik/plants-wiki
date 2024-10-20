@@ -1,9 +1,9 @@
 // src/app/calendar/page.tsx
 
 import React, { useState, useEffect } from 'react';
-import Layout from '../components/Layout';
-import Calendar from '../components/Calendar';
-import AddEventModal from '../components/AddEventModal';
+import Layout from '@/components/Layout';
+import Calendar from '@/components/Calendar';
+import AddEventModal from '@/components/AddEventModal';
 
 const CalendarPage: React.FC = () => {
   const [events, setEvents] = useState([]);

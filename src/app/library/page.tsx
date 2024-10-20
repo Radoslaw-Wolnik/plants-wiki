@@ -1,9 +1,9 @@
 // src/pages/library/page.tsx
 
 import React, { useState, useEffect } from 'react';
-import Layout from '../../components/Layout';
-import RoomCard from '../../components/plants/RoomCard';
-import AddPlantModal from '../../components/plants/AddPlantModal';
+import Layout from '@/components/Layout';
+import RoomCard from '@/components/plants/RoomCard';
+import AddPlantModal from '@/components/plants/AddPlantModal';
 
 const UserLibraryPage: React.FC = () => {
   const [rooms, setRooms] = useState([]);

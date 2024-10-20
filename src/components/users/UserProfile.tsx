@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Card, Button, Form } from '../common';
-import { User } from '../../types';
+import { User } from '@/types/global';
 
 interface UserProfileProps {
   user: User;

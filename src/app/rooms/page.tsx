@@ -3,9 +3,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import Layout from '../../components/Layout';
-import RoomCard from '../../components/plants/RoomCard';
-import AddRoomModal from '../../components/AddRoomModal';
+import Layout from '@/components/Layout';
+import RoomCard from '@/components/plants/RoomCard';
+import AddRoomModal from '@/components/AddRoomModal';
 
 interface Room {
   id: number;

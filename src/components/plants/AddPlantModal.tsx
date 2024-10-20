@@ -1,8 +1,7 @@
 // src/components/plants/AddPlantModal.tsx
 
 import React, { useState } from 'react';
-import Modal from '../common/Modal';
-import Form from '../common/Form';
+import { Modal, Form } from '../common';
 
 interface AddPlantModalProps {
   isOpen: boolean;

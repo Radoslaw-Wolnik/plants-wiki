@@ -2,8 +2,8 @@
 
 import { PrismaClient } from '@prisma/client';
 import { addDays } from 'date-fns';
-import { BadRequestError, ForbiddenError } from './errors';
-import logger from './logger';
+import { BadRequestError, ForbiddenError } from '@/lib/errors';
+import logger from '@/lib/logger';
 
 const prisma = new PrismaClient();
 

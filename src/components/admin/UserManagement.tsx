@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Card, Input, Button, Table } from '../common';
-import { User } from '../../types';
+import { User } from '@/types/global';
 
 const UserManagement: React.FC = () => {
   const { data: session } = useSession();

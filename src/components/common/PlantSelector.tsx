@@ -2,8 +2,8 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Card } from './Card';
-import { Plant } from '../../types';
+import Card from './Card';
+import { Plant } from '@/types/global';
 
 interface PlantSelectorProps {
   plants: Plant[];

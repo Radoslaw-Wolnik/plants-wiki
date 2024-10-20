@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Card, Button, TextArea } from '../common';
-import { formatDate } from '../../utils';
+import { Card, Button, TextArea } from '@/components/common';
+import { formatDate } from '@/utils/general.util';
 
 interface CareTip {
   id: number;

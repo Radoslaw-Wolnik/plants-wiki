@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Layout from '../../components/Layout';
-import PlantInfo from '../../components/PlantInfo';
-import PlantArticle from '../../components/PlantArticle';
+import Layout from '@/components/Layout';
+import PlantInfo from '@/components/PlantInfo';
+import PlantArticle from '@/components/PlantArticle';
 
 const PlantDetailPage: React.FC = () => {
   const router = useRouter();

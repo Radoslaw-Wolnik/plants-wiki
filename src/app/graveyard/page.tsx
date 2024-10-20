@@ -1,9 +1,9 @@
 // src/app/graveyard/page.tsx
 
 import React, { useState, useEffect } from 'react';
-import Layout from '../components/Layout';
-import GraveyardItem from '../components/GraveyardItem';
-import AddToGraveyardModal from '../components/AddToGraveyardModal';
+import Layout from '@/components/Layout';
+import GraveyardItem from '@/components/GraveyardItem';
+import AddToGraveyardModal from '@/components/AddToGraveyardModal';
 
 const GraveyardPage: React.FC = () => {
   const [graveyardItems, setGraveyardItems] = useState([]);

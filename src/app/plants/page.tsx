@@ -1,9 +1,9 @@
 // src/pages/plants/page.tsx
 
 import React, { useState, useEffect } from 'react';
-import Layout from '../../components/Layout';
-import PlantCard from '../../components/plants/PlantCard';
-import Pagination from '../../components/common/Pagination';
+import Layout from '@/components/Layout';
+import PlantCard from '@/components/plants/PlantCard';
+import Pagination from '@/components/common/Pagination';
 
 const PlantsPage: React.FC = () => {
   const [plants, setPlants] = useState([]);

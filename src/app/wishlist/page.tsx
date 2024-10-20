@@ -1,9 +1,9 @@
 // src/app/wishlist/page.tsx
 
 import React, { useState, useEffect } from 'react';
-import Layout from '../components/Layout';
-import WishlistItem from '../components/WishlistItem';
-import AddToWishlistModal from '../components/AddToWishlistModal';
+import Layout from '@/components/Layout';
+import WishlistItem from '@/components/WishlistItem';
+import AddToWishlistModal from '@/components/AddToWishlistModal';
 
 const WishlistPage: React.FC = () => {
   const [wishlistItems, setWishlistItems] = useState([]);
