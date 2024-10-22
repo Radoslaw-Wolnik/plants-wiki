@@ -2,33 +2,34 @@
 import { Room } from '../types/room';
 import { apiClient } from '../client';
 
-export const rooms = {
-  getAll: async () => {
-    const { data } = await apiClient.get<Room[]>('/users/rooms');
-    return data;
-  },
+export async function getAllRooms() {
+  const { data } = await apiClient.get<Room[]>('/users/rooms');
+  return data;
+}
 
-  create: async (roomData: {
-    name: string;
-    type: Room['type'];
-    sunlight: string;
-    humidity: string;
-  }) => {
-    const { data } = await apiClient.post<Room>('/users/rooms', roomData);
-    return data;
-  },
+export async function createRoom(roomData: {
+  name: string;
+  type: Room['type'];
+  sunlight: string;
+  humidity: string;
+}) {
+  const { data } = await apiClient.post<Room>('/users/rooms', roomData);
+  return data;
+}
 
-  update: async (roomId: number, roomData: {
+export async function updateRoom(
+  roomId: number,
+  roomData: {
     name?: string;
     type?: Room['type'];
     sunlight?: string;
     humidity?: string;
-  }) => {
-    const { data } = await apiClient.put<Room>(`/users/rooms?id=${roomId}`, roomData);
-    return data;
-  },
+  }
+) {
+  const { data } = await apiClient.put<Room>(`/users/rooms?id=${roomId}`, roomData);
+  return data;
+}
 
-  delete: async (roomId: number) => {
-    await apiClient.delete(`/users/rooms?id=${roomId}`);
-  },
-};
+export async function deleteRoom(roomId: number) {
+  await apiClient.delete(`/users/rooms?id=${roomId}`);
+}

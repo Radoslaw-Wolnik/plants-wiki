@@ -1,27 +1,25 @@
 import { apiClient } from '../client';
 import { LoginCredentials, RegisterCredentials, AuthResponse } from '../types/auth';
 
-export const auth = {
-  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const { data } = await apiClient.post<AuthResponse>('/auth/signin', credentials);
+export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
+  const { data } = await apiClient.post<AuthResponse>('/auth/signin', credentials);
+  return data;
+}
+
+export async function register(credentials: RegisterCredentials): Promise<AuthResponse> {
+  const { data } = await apiClient.post<AuthResponse>('/auth/register', credentials);
+  return data;
+}
+
+export async function logout(): Promise<void> {
+  await apiClient.post('/auth/signout');
+}
+
+export async function getCurrentUser(): Promise<AuthResponse | null> {
+  try {
+    const { data } = await apiClient.get<AuthResponse>('/auth/session');
     return data;
-  },
-
-  register: async (credentials: RegisterCredentials): Promise<AuthResponse> => {
-    const { data } = await apiClient.post<AuthResponse>('/auth/register', credentials);
-    return data;
-  },
-
-  logout: async (): Promise<void> => {
-    await apiClient.post('/auth/signout');
-  },
-
-  getCurrentUser: async (): Promise<AuthResponse | null> => {
-    try {
-      const { data } = await apiClient.get<AuthResponse>('/auth/session');
-      return data;
-    } catch {
-      return null;
-    }
-  },
-};
+  } catch {
+    return null;
+  }
+}
