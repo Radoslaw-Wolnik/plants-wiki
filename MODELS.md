@@ -1,12 +1,16 @@
-# Database Models Documentation
+# Plant Management System - Database Models Documentation
 
-## Overview
+## Table of Contents
+1. [System Overview](#system-overview)
+2. [Core User System](#core-user-system)
+3. [Plant Management](#plant-management)
+4. [Content Management](#content-management)
+5. [Moderation System](#moderation-system)
+6. [Trading System](#trading-system)
 
-This document provides comprehensive documentation for the database models used in the plant management application. The system is divided into several interconnected modules, each handling specific functionality.
+## System Overview
 
-## System Architecture
-
-### Complete System Diagram
+### Complete System Architecture
 ```mermaid
 graph TB
     subgraph "Core User System"
@@ -89,76 +93,137 @@ graph TB
     CareTip --> CareTipLike
 ```
 
-### Core User System
+## Core User System
+
+### Entity Relationships
 ```mermaid
 graph LR
-    subgraph "Authentication"
-        User --> Token
-        User --> UserNotification
-    end
-
-    subgraph "User Relations"
-        User --> User
-        User --> UserLibrary
-    end
-
-    subgraph "User States"
-        User --> isBanned
-        User --> strikes
-        User --> role[UserRole]
-    end
-
-    classDef default fill:#e6f3ff,stroke:#333,stroke-width:2px;
-    classDef state fill:#fff3e6,stroke:#333,stroke-width:2px;
-    class isBanned,strikes,role state;
+    User --> Token
+    User --> UserLibrary
+    User --> UserNotification
+    User --> Room
+    User --> ModeratorRequest
+    User --> Article
+    User --> Comment
+    User --> Discussion
+    User --> CareTip
+    User --> WishlistPlant
+    User --> GraveyardPlant
+    User --> TradeOffer
+    User --> UserFlag
 ```
 
-### Plant Management System
+### Schema Tables
+
+#### User
+| Field | Type | Description | Constraints |
+|-------|------|-------------|-------------|
+| id | Int | Primary key | @id @default(autoincrement()) |
+| username | String | Username | @unique |
+| email | String | Email address | @unique |
+| password | String | Hashed password | Required |
+| profilePicture | String? | Profile image URL | Optional |
+| role | UserRole | User role | @default(USER) |
+| createdAt | DateTime | Creation timestamp | @default(now()) |
+| updatedAt | DateTime | Update timestamp | @updatedAt |
+| strikes | Int | Strike count | @default(0) |
+| isBanned | Boolean | Ban status | @default(false) |
+| banExpiresAt | DateTime? | Ban expiration | Optional |
+| lastActive | DateTime | Last activity | @default(now()) |
+
+#### Token
+| Field | Type | Description | Constraints |
+|-------|------|-------------|-------------|
+| id | Int | Primary key | @id @default(autoincrement()) |
+| userId | Int | User reference | FK |
+| token | String | Token value | @unique |
+| type | TokenType | Token type | Required |
+| expiresAt | DateTime | Expiration time | Required |
+| isActive | Boolean | Active status | @default(true) |
+
+## Plant Management
+
+### Entity Relationships
 ```mermaid
 graph TB
-    subgraph "Plant Core"
-        Plant --> PlantIcon
-        Plant --> PlantVerification
-    end
-
-    subgraph "User Plant Management"
-        UserLibrary --> UserPlant
-        UserPlant --> WateringLog
-        UserPlant --> FertilizingLog
-        UserPlant --> UserPlantPhoto
-        UserPlant --> Room
-    end
-
     Plant --> UserPlant
-
-    classDef default fill:#e6ffe6,stroke:#333,stroke-width:2px;
-    classDef tracking fill:#ffe6e6,stroke:#333,stroke-width:2px;
-    class WateringLog,FertilizingLog,UserPlantPhoto tracking;
+    Plant --> PlantIcon
+    Plant --> PlantVerification
+    Plant --> PlantPhoto
+    
+    UserLibrary --> UserPlant
+    UserPlant --> WateringLog
+    UserPlant --> FertilizingLog
+    UserPlant --> UserPlantPhoto
+    UserPlant --> Room
+    UserPlant --> TradeOffer
 ```
 
-### Content Management System
+### Schema Tables
+
+#### Plant
+| Field | Type | Description | Constraints |
+|-------|------|-------------|-------------|
+| id | Int | Primary key | @id @default(autoincrement()) |
+| name | String | Plant name | Required |
+| scientificName | String | Scientific name | @unique |
+| commonName | String | Common name | Required |
+| family | String | Plant family | Required |
+| icon | String | Icon path | Required |
+| light | String | Light needs | Required |
+| temperature | String | Temperature range | Required |
+| soil | String | Soil type | Required |
+| climate | String | Climate info | Required |
+| humidity | String | Humidity needs | Required |
+| growthCycle | String | Growth pattern | Required |
+| toxicity | String | Toxicity info | Required |
+| petSafe | Boolean | Pet safety | Required |
+| plantType | String | Plant type | Required |
+
+#### UserPlant
+| Field | Type | Description | Constraints |
+|-------|------|-------------|-------------|
+| id | Int | Primary key | @id @default(autoincrement()) |
+| libraryId | Int | Library reference | FK |
+| plantId | Int | Plant reference | FK, @unique |
+| nickname | String? | Custom name | Optional |
+| acquiredDate | DateTime | Acquisition date | Required |
+| notes | String? | Care notes | Optional |
+
+## Content Management
+
+### Entity Relationships
 ```mermaid
 graph LR
-    subgraph "Article System"
-        Article --> Comment
-        Article --> Discussion
-        Article --> ArticlePhoto
-    end
-
-    subgraph "Care Tips"
-        CareTip --> CareTipLike
-        CareTip --> CareTipFlag
-    end
-
+    Article --> Comment
+    Article --> Discussion
+    Article --> ArticlePhoto
+    Article --> ChangeRequest
+    
     Plant --> Article
     Plant --> CareTip
-
-    classDef default fill:#fff0f7,stroke:#333,stroke-width:2px;
-    classDef social fill:#f8f9fa,stroke:#333,stroke-width:2px;
-    class Comment,Discussion social;
+    
+    CareTip --> CareTipLike
+    CareTip --> CareTipFlag
 ```
 
-### Moderation System
+### Schema Tables
+
+#### Article
+| Field | Type | Description | Constraints |
+|-------|------|-------------|-------------|
+| id | Int | Primary key | @id @default(autoincrement()) |
+| title | String | Article title | Required |
+| content | String | Article content | Required |
+| plantId | Int | Plant reference | FK, @unique |
+| createdAt | DateTime | Creation time | @default(now()) |
+| updatedAt | DateTime | Update time | @updatedAt |
+
+[Additional tables follow same pattern...]
+
+## Moderation System
+
+### Process Flow
 ```mermaid
 stateDiagram-v2
     [*] --> Pending
@@ -174,460 +239,258 @@ stateDiagram-v2
     
     Approved --> [*]
     Rejected --> [*]
-
-    note right of Pending
-        Applies to:
-        - ModeratorRequests
-        - ChangeRequests
-        - PlantVerification
-        - Icons
-    end note
 ```
 
-### Trading System
-```mermaid
-stateDiagram-v2
-    [*] --> TradeOffer
-    
-    TradeOffer --> Pending: Created
-    Pending --> Accepted: Recipient Accepts
-    Pending --> Rejected: Recipient Rejects
-    
-    state TradeOffer {
-        [*] --> OfferCreation
-        OfferCreation --> PlantSelection
-        PlantSelection --> MessageCreation
-        MessageCreation --> Review
-    }
-    
-    Accepted --> Complete: Trade Completed
-    Rejected --> [*]
-    Complete --> [*]
-```
-
-## Detailed Module Documentation
-
-### 1. Core User System
-
-#### User
-Central entity managing user accounts and authentication.
-
-**Key Relationships:**
-```mermaid
-graph LR
-    User --> UserLibrary
-    User --> Token
-    User --> UserNotification
-    User --> Room
-    User --> Article
-    User --> Comment
-    User --> Discussion
-    User --> CareTip
-    User --> ModeratorRequest
-    User --> TradeOffer
-```
-
-
-### Entity Flow Diagrams
-
-#### Plant Creation and Verification Flow
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant P as Plant
-    participant V as PlantVerification
-    participant M as Moderator
-    
-    U->>V: Submit new plant
-    V->>M: Review request
-    alt Approved
-        M->>P: Create verified plant
-        M->>U: Notify approval
-    else Rejected
-        M->>U: Notify rejection with reason
-    end
-```
-
-#### Trade Flow
-```mermaid
-sequenceDiagram
-    participant S as Sender
-    participant T as TradeOffer
-    participant R as Recipient
-    
-    S->>T: Create trade offer
-    T->>R: Notify recipient
-    alt Accepted
-        R->>T: Accept offer
-        T->>S: Notify acceptance
-        T->>S: Transfer plants
-        T->>R: Transfer plants
-    else Rejected
-        R->>T: Reject offer
-        T->>S: Notify rejection
-    end
-```
-
-## Query Examples and Best Practices
-
-### Common Queries with Included Relations
-
-```typescript
-// Get user with complete profile
-const userProfile = await prisma.user.findUnique({
-  where: { id: userId },
-  include: {
-    library: {
-      include: {
-        userPlants: {
-          include: {
-            plant: true,
-            room: true,
-            wateringLogs: { take: 5 },
-            fertilizingLogs: { take: 5 }
-          }
-        }
-      }
-    },
-    articles: true,
-    careTips: true,
-    rooms: true
-  }
-});
-
-// Get plant with all related content
-const plantDetails = await prisma.plant.findUnique({
-  where: { id: plantId },
-  include: {
-    article: {
-      include: {
-        comments: true,
-        discussions: true,
-        photos: true
-      }
-    },
-    careTips: {
-      include: {
-        likes: true,
-        author: true
-      }
-    },
-    icons: {
-      where: { status: 'APPROVED' },
-      orderBy: { version: 'desc' },
-      take: 1
-    }
-  }
-});
-```
-
-
-**Key Relationships:**
-```mermaid
-graph LR
-    Plant --> UserPlant
-    Plant --> Article
-    Plant --> CareTip
-    Plant --> PlantIcon
-    Plant --> PlantVerification
-    Plant --> PlantPhoto
-```
-
-**Fields:**
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| id | Int | Primary key | @id @default(autoincrement()) |
-| scientificName | String | Botanical name | @unique |
-| commonName | String | Common name | Required |
-| family | String | Plant family | Required |
-| icon | String | Default icon path | Required |
-| light | String | Light requirements | Required |
-| temperature | String | Temperature range | Required |
-| soil | String | Soil preferences | Required |
-| climate | String | Climate zones | Required |
-| humidity | String | Humidity needs | Required |
-| growthCycle | String | Growth pattern | Required |
-| toxicity | String | Toxicity info | Required |
-| petSafe | Boolean | Pet safety status | Required |
-| plantType | String | Plant category | Required |
-
-#### UserPlant
-Individual plant instances owned by users.
-
-**Key Relationships:**
-```mermaid
-graph LR
-    UserPlant --> WateringLog
-    UserPlant --> FertilizingLog
-    UserPlant --> UserPlantPhoto
-    UserPlant --> Room
-    UserPlant --> TradeOffer
-```
-
-**Fields:**
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| id | Int | Primary key | @id @default(autoincrement()) |
-| libraryId | Int | Owner's library | Required, FK |
-| plantId | Int | Plant reference | Required, FK |
-| nickname | String | Custom name | Optional |
-| acquiredDate | DateTime | Acquisition date | Required |
-| notes | String | Care notes | Optional |
-
-### 3. Content Management System
-
-#### Article
-Comprehensive plant care guides.
-
-**Key Relationships:**
-```mermaid
-graph LR
-    Article --> Comment
-    Article --> Discussion
-    Article --> ChangeRequest
-    Article --> ArticlePhoto
-```
-
-**Fields:**
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| id | Int | Primary key | @id @default(autoincrement()) |
-| title | String | Article title | Required |
-| content | String | Main content | Required |
-| plantId | Int | Related plant | Required, FK, @unique |
-
-#### Discussion
-Threaded conversations on articles.
-
-**Fields:**
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| id | Int | Primary key | @id @default(autoincrement()) |
-| content | String | Message content | Required |
-| articleId | Int | Parent article | Required, FK |
-| authorId | Int | Author reference | Required, FK |
-| parentId | Int? | Parent discussion | Optional, FK |
-
-### 4. Moderation System
+### Schema Tables
 
 #### ModeratorRequest
-User applications for moderator status.
-
-**State Flow:**
-```mermaid
-stateDiagram-v2
-    [*] --> PENDING: Submit Request
-    PENDING --> APPROVED: Approved by Admin
-    PENDING --> REJECTED: Rejected by Admin
-    APPROVED --> [*]: Role Updated
-    REJECTED --> [*]: Request Closed
-```
-
-**Fields:**
 | Field | Type | Description | Constraints |
 |-------|------|-------------|-------------|
 | id | Int | Primary key | @id @default(autoincrement()) |
-| userId | Int | Applicant | Required, FK |
-| status | ModeratorRequestStatus | Request state | @default(PENDING) |
+| userId | Int | User reference | FK |
+| status | ModeratorRequestStatus | Request status | @default(PENDING) |
+| createdAt | DateTime | Creation time | @default(now()) |
+| updatedAt | DateTime | Update time | @updatedAt |
 
-#### PlantVerification
-New plant entry verification system.
+## Trading System
 
-**Verification Flow:**
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant V as Verification
-    participant M as Moderator
-    participant P as Plant
-    
-    U->>V: Submit plant details
-    V->>M: Await review
-    alt Approved
-        M->>V: Approve submission
-        V->>P: Create plant entry
-        V->>U: Notify success
-    else Rejected
-        M->>V: Reject with reason
-        V->>U: Notify rejection
-    end
-```
-
-### 5. Trading System
-
-#### TradeOffer
-Plant exchange management.
-
-**Trade Flow:**
+### Trade Flow
 ```mermaid
 stateDiagram-v2
     [*] --> PENDING: Create Offer
     PENDING --> ACCEPTED: Accept Trade
     PENDING --> REJECTED: Reject Trade
-    ACCEPTED --> COMPLETED: Exchange Complete
+    ACCEPTED --> COMPLETED: Exchange Done
     REJECTED --> [*]: Offer Closed
     COMPLETED --> [*]: Trade Finished
 ```
 
-**Fields:**
+### Schema Tables
+
+#### TradeOffer
 | Field | Type | Description | Constraints |
 |-------|------|-------------|-------------|
 | id | Int | Primary key | @id @default(autoincrement()) |
-| offererId | Int | Offering user | Required, FK |
-| recipientId | Int | Receiving user | Required, FK |
-| offeredPlantId | Int | Offered plant | Required, FK |
-| requestedPlantId | Int | Requested plant | Required, FK |
-| status | TradeStatus | Trade state | Required |
-| message | String | Trade message | Optional |
+| offererId | Int | Offering user | FK |
+| recipientId | Int | Receiving user | FK |
+| offeredPlantId | Int | Plant offered | FK |
+| requestedPlantId | Int | Plant requested | FK |
+| status | TradeStatus | Trade status | Required |
+| message | String? | Trade message | Optional |
+| createdAt | DateTime | Creation time | @default(now()) |
+| updatedAt | DateTime | Update time | @updatedAt |
 
-### 6. Notification System
+## Enums
+
+### User Related
+- **UserRole**: `USER`, `MODERATOR`, `ADMIN`
+- **TokenType**: `PASSWORD_RESET`, `ACCOUNT_VERIFICATION`, `ONE_TIME_LOGIN`, `DEACTIVATION`
+
+### Room Related
+- **RoomType**: `LIVING_ROOM`, `BEDROOM`, `BATHROOM`, `KITCHEN`, `BALCONY`, `OUTDOOR`, `GREENHOUSE`
+
+### Moderation Related
+- **ModeratorRequestStatus**: `PENDING`, `APPROVED`, `REJECTED`
+- **RequestStatus**: `PENDING`, `APPROVED`, `REJECTED`
+- **VerificationStatus**: `PENDING`, `APPROVED`, `REJECTED`
+- **IconStatus**: `PENDING`, `APPROVED`, `REJECTED`
+
+### Trade Related
+- **TradeStatus**: `PENDING`, `ACCEPTED`, `REJECTED`, `COMPLETED`
+
+### Notification Related
+- **NotificationType**: `FRIEND_REQUEST`, `ARTICLE_COMMENT`, `CHANGE_REQUEST_APPROVED`, `CHANGE_REQUEST_REJECTED`
+
+
+## Secondary Tables
+
+### User Related Tables
+
+#### UserLibrary
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| userId | Int | FK, @unique |
 
 #### UserNotification
-User alert system.
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| type | NotificationType | Required |
+| content | String | Required |
+| relatedId | Int? | Optional |
+| read | Boolean | @default(false) |
+| userId | Int | FK |
+| createdAt | DateTime | @default(now()) |
 
-**Notification Types:**
-```mermaid
-graph TB
-    Notification[UserNotification] --> FR[FRIEND_REQUEST]
-    Notification --> AC[ARTICLE_COMMENT]
-    Notification --> CRA[CHANGE_REQUEST_APPROVED]
-    Notification --> CRR[CHANGE_REQUEST_REJECTED]
-```
+### Plant Care Tables
 
-**Fields:**
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| id | Int | Primary key | @id @default(autoincrement()) |
-| type | NotificationType | Alert type | Required |
-| content | String | Message content | Required |
-| userId | Int | Target user | Required, FK |
-| read | Boolean | Read status | @default(false) |
+#### WateringLog
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| userPlantId | Int | FK |
+| date | DateTime | Required |
+| amount | Float? | Optional |
+| notes | String? | Optional |
 
-## Common Queries and Patterns
+#### FertilizingLog
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| userPlantId | Int | FK |
+| date | DateTime | Required |
+| fertilizer | String | Required |
+| amount | Float? | Optional |
+| notes | String? | Optional |
 
-### User Management
+#### Room
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| name | String | Required |
+| type | RoomType | Required |
+| sunlight | String | Required |
+| humidity | String | Required |
+| userId | Int | FK |
 
-```typescript
-// Create new user with library
-const createUser = async (userData: UserCreateInput) => {
-  return await prisma.user.create({
-    data: {
-      ...userData,
-      library: {
-        create: {} // Initialize empty library
-      }
-    },
-    include: {
-      library: true
-    }
-  });
-};
+### Media Tables
 
-// Get user profile with plants
-const getUserProfile = async (userId: number) => {
-  return await prisma.user.findUnique({
-    where: { id: userId },
-    include: {
-      library: {
-        include: {
-          userPlants: {
-            include: {
-              plant: true,
-              room: true
-            }
-          }
-        }
-      },
-      rooms: true
-    }
-  });
-};
-```
+#### UserPlantPhoto
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| userPlantId | Int | FK |
+| url | String | Required |
+| description | String? | Optional |
+| takenAt | DateTime | @default(now()) |
 
-### Plant Management
+#### PlantPhoto
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| plantId | Int | FK |
+| url | String | Required |
+| description | String? | Optional |
+| uploadedById | Int | FK |
+| createdAt | DateTime | @default(now()) |
+| updatedAt | DateTime | @updatedAt |
 
-```typescript
-// Add plant to user's library
-const addPlantToLibrary = async (
-  userId: number,
-  plantId: number,
-  data: UserPlantCreateInput
-) => {
-  return await prisma.userPlant.create({
-    data: {
-      ...data,
-      library: {
-        connect: { userId }
-      },
-      plant: {
-        connect: { id: plantId }
-      }
-    },
-    include: {
-      plant: true
-    }
-  });
-};
+#### ArticlePhoto
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| articleId | Int | FK |
+| url | String | Required |
+| caption | String? | Optional |
+| uploadedById | Int | FK |
+| createdAt | DateTime | @default(now()) |
+| updatedAt | DateTime | @updatedAt |
 
-// Get plant with care history
-const getPlantWithCare = async (userPlantId: number) => {
-  return await prisma.userPlant.findUnique({
-    where: { id: userPlantId },
-    include: {
-      wateringLogs: {
-        orderBy: { date: 'desc' },
-        take: 10
-      },
-      fertilizingLogs: {
-        orderBy: { date: 'desc' },
-        take: 10
-      }
-    }
-  });
-};
-```
+### Content Related Tables
 
-### Content Management
+#### Comment
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| content | String | Required |
+| userId | Int | FK |
+| articleId | Int | FK |
+| createdAt | DateTime | @default(now()) |
+| updatedAt | DateTime | @updatedAt |
 
-```typescript
-// Create article with photos
-const createArticle = async (
-  plantId: number,
-  data: ArticleCreateInput,
-  photos: PhotoCreateInput[]
-) => {
-  return await prisma.article.create({
-    data: {
-      ...data,
-      plant: {
-        connect: { id: plantId }
-      },
-      photos: {
-        create: photos
-      }
-    },
-    include: {
-      photos: true
-    }
-  });
-};
+#### Discussion
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| content | String | Required |
+| articleId | Int | FK |
+| authorId | Int | FK |
+| parentId | Int? | FK, Optional |
+| createdAt | DateTime | @default(now()) |
+| updatedAt | DateTime | @updatedAt |
 
-// Get article with discussions
-const getArticleWithDiscussions = async (articleId: number) => {
-  return await prisma.article.findUnique({
-    where: { id: articleId },
-    include: {
-      discussions: {
-        include: {
-          author: true,
-          replies: {
-            include: {
-              author: true
-            }
-          }
-        }
-      }
-    }
-  });
-};
-```
+#### CareTipLike
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| careTipId | Int | FK |
+| userId | Int | FK |
+| createdAt | DateTime | @default(now()) |
+
+#### CareTipFlag
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| careTipId | Int | FK |
+| userId | Int | FK |
+| reason | String | Required |
+| resolved | Boolean | @default(false) |
+| resolvedAt | DateTime? | Optional |
+| createdAt | DateTime | @default(now()) |
+
+### Moderation Related Tables
+
+#### Approval
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| moderatorId | Int | FK |
+| changeRequestId | Int | FK |
+| createdAt | DateTime | @default(now()) |
+
+#### Flag
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| reason | String | Required |
+| changeRequestId | Int? | FK, Optional |
+| resolved | Boolean | @default(false) |
+| resolvedAt | DateTime? | Optional |
+| createdAt | DateTime | @default(now()) |
+
+### Wishlist and History Tables
+
+#### WishlistPlant
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| plantName | String | Required |
+| userId | Int | FK |
+
+#### GraveyardPlant
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| plantName | String | Required |
+| startDate | DateTime | Required |
+| endDate | DateTime | Required |
+| userId | Int | FK |
+
+### Icon System Tables
+
+#### PlantIcon
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| plantId | Int | FK |
+| userId | Int | FK |
+| version | Int | Required |
+| jsonPath | String | Required |
+| imagePath | String | Required |
+| status | IconStatus | @default(PENDING) |
+| approvedById | Int? | FK, Optional |
+| createdAt | DateTime | @default(now()) |
+| updatedAt | DateTime | @updatedAt |
+| approvedAt | DateTime? | Optional |
+
+#### PlantVerification
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | Int | @id @default(autoincrement()) |
+| submittedById | Int | FK |
+| reviewedById | Int? | FK, Optional |
+| status | VerificationStatus | @default(PENDING) |
+| createdAt | DateTime | @default(now()) |
+| updatedAt | DateTime | @updatedAt |
+| reviewedAt | DateTime? | Optional |
