@@ -1,345 +1,648 @@
-# Plant Wiki API Documentation
-
-This document provides details on the available API endpoints for the Plant Wiki Website.
+# PlantPal API Documentation
 
 ## Table of Contents
-
 1. [Authentication](#authentication)
 2. [Users](#users)
 3. [Plants](#plants)
 4. [Articles](#articles)
 5. [Discussions](#discussions)
-6. [User Plants](#user-plants)
-7. [Rooms](#rooms)
-8. [Watering and Fertilizing](#watering-and-fertilizing)
-9. [Wishlist and Graveyard](#wishlist-and-graveyard)
-10. [Moderation](#moderation)
+6. [Rooms](#rooms)
+7. [Trade Offers](#trade-offers)
+8. [Notifications](#notifications)
+9. [Moderation](#moderation)
 
 ## Authentication
 
-### Register a new user
+Authentication is handled using NextAuth.js. Most endpoints require a valid session.
 
 ```
-POST /api/auth/register
-```
-
-Request body:
-```json
-{
-  "username": "plantlover",
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-### Login
-
-```
-POST /api/auth/login
-```
-
-Request body:
-```json
-{
-  "username": "plantlover",
-  "password": "password123"
-}
+POST /api/auth/[...nextauth]
 ```
 
 ## Users
 
-### Get user profile
+### Get User Profile
 
 ```
-GET /api/users/profile
+🔒 GET /api/users/profile
+Response: SafeUser
 ```
 
-### Update user profile
+Returns the profile of the authenticated user.
+
+### Update User Profile
 
 ```
-PUT /api/users/profile
+🔒 PUT /api/users/profile
+Body: { username?: string, email?: string }
+Response: SafeUser
 ```
 
-Request body:
-```json
-{
-  "username": "newusername",
-  "email": "newemail@example.com"
+Updates the profile of the authenticated user.
+
+### Upload Profile Picture
+
+```
+🔒 POST /api/users/profile/picture
+Body: FormData (file)
+Response: { success: boolean, fileUrl: string }
+```
+
+Uploads a new profile picture for the authenticated user.
+
+### Get User Library
+
+```
+🔒 GET /api/users/[id]/library?page=number&limit=number&search=string
+Response: {
+  library: UserLibrary & { userPlants: (UserPlant & { plant: Plant, room: Room })[] },
+  pagination: { currentPage: number, totalPages: number, totalCount: number }
 }
 ```
 
-### Search users
+Retrieves the plant library for a specific user.
+
+### Add Plant to Library
 
 ```
-GET /api/users/search?q=searchterm
+🔒 POST /api/users/library/plants
+Body: { plantId: number, nickname?: string, roomId?: number, notes?: string }
+Response: UserPlant & { plant: Plant, room: Room }
 ```
+
+Adds a new plant to the user's library.
+
+### Get User Plant Details
+
+```
+🔒 GET /api/users/library/plants?userPlantId=number
+Response: UserPlant & { 
+  plant: Plant, 
+  room: Room, 
+  photos: UserPlantPhoto[], 
+  wateringLogs: WateringLog[], 
+  fertilizingLogs: FertilizingLog[] 
+}
+```
+
+Retrieves detailed information about a specific plant in the user's library.
+
+### Update User Plant
+
+```
+🔒 PUT /api/users/library/plants/[id]
+Body: FormData (data: string, file?: File)
+Response: { success: boolean, plant: UserPlant }
+```
+
+Updates information about a specific plant in the user's library.
+
+### Log Watering for User Plant
+
+```
+🔒 POST /api/users/library/plants/[id]/watering
+Body: { date: string, amount?: number, notes?: string }
+Response: WateringLog
+```
+
+Logs a watering event for a specific plant.
+
+### Log Fertilizing for User Plant
+
+```
+🔒 POST /api/users/library/plants/[id]/fertilizing
+Body: { date: string, fertilizer: string, amount?: number, notes?: string }
+Response: FertilizingLog
+```
+
+Logs a fertilizing event for a specific plant.
+
+### Move Plant to Room
+
+```
+🔒 PUT /api/users/library/plants/[id]/move
+Body: { roomId: number }
+Response: UserPlant & { plant: Plant, room: Room }
+```
+
+Moves a plant to a different room.
+
+### Add Plant to Graveyard
+
+```
+🔒 POST /api/users/library/plants/[id]/graveyard
+Body: { endDate: string }
+Response: GraveyardPlant
+```
+
+Moves a plant from the user's library to the graveyard.
+
+### Get User Rooms
+
+```
+🔒 GET /api/users/rooms
+Response: (Room & { userPlants: { id: number, nickname: string, plant: { name: string, icon: string } }[] })[]
+```
+
+Retrieves all rooms belonging to the authenticated user.
+
+### Create Room
+
+```
+🔒 POST /api/users/rooms
+Body: { name: string, type: RoomType, sunlight: string, humidity: string }
+Response: Room
+```
+
+Creates a new room for the authenticated user.
+
+### Update Room
+
+```
+🔒 PUT /api/users/rooms?id=number
+Body: { name: string, type: RoomType, sunlight: string, humidity: string }
+Response: Room
+```
+
+Updates an existing room.
+
+### Delete Room
+
+```
+🔒 DELETE /api/users/rooms?id=number
+Response: { message: string }
+```
+
+Deletes a room.
+
+### Get User Wishlist
+
+```
+🔒 GET /api/users/wishlist
+Response: WishlistPlant[]
+```
+
+Retrieves the user's plant wishlist.
+
+### Add to Wishlist
+
+```
+🔒 POST /api/users/wishlist
+Body: { plantName: string }
+Response: WishlistPlant
+```
+
+Adds a plant to the user's wishlist.
+
+### Remove from Wishlist
+
+```
+🔒 DELETE /api/users/wishlist?id=number
+Response: { message: string }
+```
+
+Removes a plant from the user's wishlist.
+
+### Get User Graveyard
+
+```
+🔒 GET /api/users/graveyard
+Response: GraveyardPlant[]
+```
+
+Retrieves the user's plant graveyard.
+
+### Add to Graveyard
+
+```
+🔒 POST /api/users/graveyard
+Body: { plantName: string, startDate: string, endDate: string }
+Response: GraveyardPlant
+```
+
+Adds a plant to the user's graveyard.
+
+### Remove from Graveyard
+
+```
+🔒 DELETE /api/users/graveyard?id=number
+Response: { message: string }
+```
+
+Removes a plant from the user's graveyard.
+
+### Get User Friends
+
+```
+🔒 GET /api/users/friends
+Response: { id: number, username: string, profilePicture: string }[]
+```
+
+Retrieves the user's friends list.
+
+### Add Friend
+
+```
+🔒 POST /api/users/friends
+Body: { friendId: number }
+Response: { id: number, username: string, profilePicture: string }
+```
+
+Adds a new friend to the user's friend list.
+
+### Remove Friend
+
+```
+🔒 DELETE /api/users/friends?id=number
+Response: { message: string }
+```
+
+Removes a friend from the user's friend list.
+
+### Search Users
+
+```
+🔒 GET /api/users/search?q=string
+Response: { id: number, username: string, email: string, profilePicture: string }[]
+```
+
+Searches for users based on a query string.
 
 ## Plants
 
-### Get all plants
+### Create Plant
 
 ```
-GET /api/plants
+🔒 POST /api/plants
+Body: FormData (plant details + icon file)
+Response: Plant
 ```
 
-### Create a new plant
+Creates a new plant in the database.
+
+### Get Plant Details
 
 ```
-POST /api/plants
+GET /api/plants/[id]
+Response: Plant
 ```
 
-Request body:
-```json
-{
-  "name": "Monstera Deliciosa",
-  "scientificName": "Monstera deliciosa",
-  "commonName": "Swiss Cheese Plant",
-  "family": "Araceae",
-  "light": "Bright indirect light",
-  "temperature": "65-85°F",
-  "soil": "Well-draining potting mix",
-  "climate": "Tropical",
-  "humidity": "High",
-  "growthCycle": "Perennial",
-  "toxicity": "Mildly toxic to pets and humans",
-  "petSafe": false,
-  "plantType": "Climbing vine",
-  "sex": "Monoecious"
-}
-```
+Retrieves details about a specific plant.
 
-### Get plant details
+### Upload Plant Photo
 
 ```
-GET /api/plants/{id}
+🔒 POST /api/plants/[id]/photos
+Body: FormData (file, description)
+Response: { success: boolean, photo: PlantPhoto }
 ```
 
-### Update a plant
+Uploads a photo for a specific plant.
+
+### Upload Plant Icon
 
 ```
-PUT /api/plants/{id}
+🔒 POST /api/plants/[id]/icon
+Body: FormData (file)
+Response: { success: boolean, plant: Plant }
 ```
 
-Request body: (same as create plant)
+Uploads or updates the icon for a specific plant.
+
+### Get Plant Care Tips
+
+```
+🔒 GET /api/plants/[id]/care-tips
+Response: (CareTip & { author: { id: number, username: string }, _count: { likes: number, flags: number } })[]
+```
+
+Retrieves care tips for a specific plant.
+
+### Add Plant Care Tip
+
+```
+🔒 POST /api/plants/[id]/care-tips
+Body: { title: string, content: string }
+Response: CareTip
+```
+
+Adds a new care tip for a specific plant.
+
+### Like/Unlike Care Tip
+
+```
+🔒 PUT /api/plants/[id]/care-tips/[tipId]
+Response: { message: string }
+```
+
+Toggles the like status of a care tip.
+
+### Flag Care Tip
+
+```
+🔒 PATCH /api/plants/[id]/care-tips/[tipId]
+Body: { reason: string }
+Response: { message: string }
+```
+
+Flags a care tip for review.
 
 ## Articles
 
-### Get all articles
+### Create Article
 
 ```
-GET /api/articles
+🔒 POST /api/articles
+Body: { title: string, content: string, plantId: number }
+Response: Article
 ```
 
-### Create a new article
+Creates a new article.
+
+### Get Article Details
 
 ```
-POST /api/articles
-```
-
-Request body:
-```json
-{
-  "title": "Caring for Monstera Deliciosa",
-  "content": "Monstera deliciosa, also known as the Swiss Cheese Plant, is a popular houseplant...",
-  "plantId": 1
+GET /api/articles/[id]
+Response: Article & {
+  contributors: { id: number, username: string, profilePicture: string }[],
+  plant: { id: number, name: string, scientificName: string, icon: string },
+  comments: (Comment & { user: { id: number, username: string, profilePicture: string } })[],
+  changeRequests?: ChangeRequest[]
 }
 ```
 
-### Get article details
+Retrieves details about a specific article.
+
+### Upload Article Photo
 
 ```
-GET /api/articles/{id}
+🔒 POST /api/articles/[id]/photos
+Body: FormData (file, caption)
+Response: { success: boolean, photo: ArticlePhoto }
 ```
 
-### Update an article
+Uploads a photo for a specific article.
+
+### Get Article Change Requests
 
 ```
-PUT /api/articles/{id}
+🔒 GET /api/articles/[id]/change-requests
+Response: (ChangeRequest & { 
+  author: { id: number, username: string }, 
+  approvals: { moderator: { id: number, username: string } }[] 
+})[]
 ```
 
-Request body: (same as create article)
+Retrieves change requests for a specific article.
+
+### Create Change Request
+
+```
+🔒 POST /api/articles/[id]/change-requests
+Body: { content: string }
+Response: ChangeRequest
+```
+
+Creates a new change request for an article.
+
+### Process Change Request
+
+```
+🔒 PUT /api/articles/[id]/change-requests/[requestId]
+Body: { action: 'APPROVE' | 'REJECT' }
+Response: ChangeRequest
+```
+
+Approves or rejects a change request for an article.
 
 ## Discussions
 
-### Get discussions for an article
+### Create Discussion
 
 ```
-GET /api/discussions?articleId=1
+🔒 POST /api/discussions
+Body: { content: string, articleId: number, parentId?: number }
+Response: Discussion
 ```
 
-### Create a new discussion
+Creates a new discussion or reply.
+
+### Get Discussions
 
 ```
-POST /api/discussions
+🔒 GET /api/discussions?articleId=number
+Response: (Discussion & { 
+  author: { id: number, username: string, profilePicture: string }, 
+  replies: (Discussion & { author: { id: number, username: string, profilePicture: string } })[] 
+})[]
 ```
 
-Request body:
-```json
-{
-  "content": "Great article! I have a question about watering frequency.",
-  "articleId": 1,
-  "parentId": null
-}
-```
+Retrieves discussions for a specific article.
 
-## User Plants
+## Trade Offers
 
-### Get user's plant library
+### Create Trade Offer
 
 ```
-GET /api/users/library
+🔒 POST /api/trade-offers
+Body: { offeredPlantId: number, requestedPlantId: number, message?: string }
+Response: TradeOffer
 ```
 
-### Add plant to user's library
+Creates a new trade offer.
+
+### Get Trade Offers
 
 ```
-POST /api/users/library/plants
+🔒 GET /api/trade-offers
+Response: (TradeOffer & {
+  offerer: { id: number, username: string, profilePicture: string },
+  recipient: { id: number, username: string, profilePicture: string },
+  offeredPlant: { plant: Plant },
+  requestedPlant: { plant: Plant }
+})[]
 ```
 
-Request body:
-```json
-{
-  "plantId": 1,
-  "nickname": "Monty",
-  "roomId": 2,
-  "notes": "Got this as a gift from Mom"
-}
-```
+Retrieves all trade offers for the authenticated user.
 
-## Rooms
-
-### Get user's rooms
+### Process Trade Offer
 
 ```
-GET /api/users/rooms
+🔒 PUT /api/trade-offers?id=number&action=string
+Response: { message: string }
 ```
 
-### Create a new room
+Accepts or rejects a trade offer.
+
+## Notifications
+
+### Get User Notifications
 
 ```
-POST /api/users/rooms
+🔒 GET /api/users/notifications
+Response: UserNotification[]
 ```
 
-Request body:
-```json
-{
-  "name": "Living Room",
-  "type": "LIVING_ROOM",
-  "sunlight": "Bright indirect",
-  "humidity": "Medium"
-}
-```
+Retrieves notifications for the authenticated user.
 
-## Watering and Fertilizing
-
-### Log watering
+### Create Notification
 
 ```
-POST /api/users/library/plants/{id}/watering
+🔒 POST /api/users/notifications
+Body: { type: NotificationType, content: string, relatedId?: number }
+Response: UserNotification
 ```
 
-Request body:
-```json
-{
-  "date": "2023-06-15T10:30:00Z",
-  "amount": 250,
-  "notes": "Used rainwater"
-}
-```
+Creates a new notification for the authenticated user.
 
-### Log fertilizing
+### Mark Notification as Read
 
 ```
-POST /api/users/library/plants/{id}/fertilizing
+🔒 PUT /api/users/notifications?id=number
+Response: UserNotification
 ```
 
-Request body:
-```json
-{
-  "date": "2023-06-15T10:30:00Z",
-  "fertilizer": "Organic liquid fertilizer",
-  "amount": 50,
-  "notes": "Half-strength solution"
-}
-```
+Marks a notification as read.
 
-## Wishlist and Graveyard
-
-### Get user's wishlist
+### Delete Notification
 
 ```
-GET /api/users/wishlist
+🔒 DELETE /api/users/notifications?id=number
+Response: { message: string }
 ```
 
-### Add plant to wishlist
-
-```
-POST /api/users/wishlist
-```
-
-Request body:
-```json
-{
-  "plantName": "Philodendron Pink Princess"
-}
-```
-
-### Get user's plant graveyard
-
-```
-GET /api/users/graveyard
-```
-
-### Add plant to graveyard
-
-```
-POST /api/users/graveyard
-```
-
-Request body:
-```json
-{
-  "plantName": "Fiddle Leaf Fig",
-  "startDate": "2023-01-01T00:00:00Z",
-  "endDate": "2023-06-01T00:00:00Z"
-}
-```
+Deletes a notification.
 
 ## Moderation
 
-### Get pending change requests
+### Request Moderator Status
 
 ```
-GET /api/moderation/change-requests
+🔒 POST /api/moderator-requests
+Response: ModeratorRequest
 ```
 
-### Review change request
+Submits a request to become a moderator.
+
+### Get Moderator Requests
 
 ```
-PUT /api/moderation/change-requests/{id}
+🔒 GET /api/moderator-requests
+Response: (ModeratorRequest & {
+  user: {
+    id: number,
+    username: string,
+    createdAt: Date,
+    _count: { approvals: number },
+    library: { _count: { userPlants: number } }
+  }
+})[]
 ```
 
-Request body:
-```json
-{
-  "action": "approve",
-  "comment": "Looks good, thanks for the contribution!"
+Retrieves all pending moderator requests (admin only).
+
+### Process Moderator Request
+
+```
+🔒 PUT /api/moderator-requests?id=number&action=string
+Response: { message: string }
+```
+
+Approves or rejects a moderator request (admin only).
+
+### Get Unresolved Flags
+
+```
+🔒 GET /api/flags?page=number&limit=number
+Response: {
+  flags: (Flag & { 
+    flaggedChange: { 
+      author: { id: number, username: string } 
+    } 
+  })[],
+  pagination: { currentPage: number, totalPages: number, totalCount: number }
 }
 ```
 
-### Flag content
+Retrieves unresolved flags (moderator/admin only).
+
+### Review Flag
 
 ```
-POST /api/moderation/flags
+🔒 POST /api/flags
+Body: { flagId: number, action: 'APPROVE' | 'REJECT', strikeUser?: boolean }
+Response: { message: string }
 ```
 
-Request body:
-```json
-{
-  "type": "DISCUSSION",
-  "contentId": 123,
-  "reason": "Inappropriate language"
+Reviews a flagged item (moderator/admin only).
+
+### Get Site Statistics
+
+```
+🔒 GET /api/admin/statistics
+Response: {
+  totalUsers: number,
+  activeUsers: number,
+  totalPlants: number,
+  totalArticles: number,
+  totalComments: number,
+  flaggedContent: number,
+  topContributors: { id: number, username: string, contributions: number }[]
 }
 ```
 
-This API documentation covers the main endpoints of the Plant Wiki Website. Ensure proper authentication and authorization are implemented for these endpoints in your application.
+Retrieves site-wide statistics (admin only).
+
+## Search
+
+### Global Search
+
+```
+🔒 GET /api/search?query=string&type=string
+Response: {
+  plants: Plant[],
+  articles: Article[],
+  users: { id: number, username: string, profilePicture: string }[]
+}
+```
+
+Performs a global search across plants, articles, and users.
+
+## Plant Verification
+
+### Submit Plant for Verification
+
+```
+🔒 POST /api/plants/verification
+Body: FormData (plant details + icon file + image file)
+Response: PlantVerification
+```
+
+Submits a new plant for verification.
+
+### Review Plant Verification
+
+```
+🔒 PUT /api/plants/verification
+Body: { id: number, status: 'APPROVED' | 'REJECTED' }
+Response: PlantVerification
+```
+
+Reviews a plant verification submission (moderator/admin only).
+
+## Calendar
+
+### Get Calendar Events
+
+```
+🔒 GET /api/users/calendar?startDate=string&endDate=string
+Response: {
+  type: 'watering' | 'fertilizing',
+  date: Date,
+  plantName: string,
+  plantId: number,
+  fertilizer?: string
+}[]
+```
+
+Retrieves calendar events (watering and fertilizing logs) for the authenticated user within a specified date range.
