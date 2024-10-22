@@ -40,7 +40,9 @@ RUN mkdir -p /app/logs \
     && mkdir -p /app/public/uploads/userplants \
     && mkdir -p /app/public/uploads/plant-icons \
     && mkdir -p /app/public/uploads/articles \
-    && mkdir -p /app/public/uploads/trades
+    && mkdir -p /app/public/uploads/trades \
+    && mkdir -p /app/public/uploads/icon/ 
+# load or save /plantID/ but not sure if everything is correctly set up
 
 # Set permissions for the logs and uploads directories
 RUN chmod -R 755 /app/logs /app/public/uploads

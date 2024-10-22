@@ -48,6 +48,8 @@ model User {
   careTipFlags      CareTipFlag[]
   uploadedPlantPhotos   PlantPhoto[]
   uploadedArticlePhotos ArticlePhoto[]
+  icons         PlantIcon[]
+  approvedIcons PlantIcon[] @relation("IconApprovals")
 }
 
 enum UserRole {
@@ -130,6 +132,7 @@ model Plant {
   careTips       CareTip[]
   photos      PlantPhoto[]
   UserPlant     UserPlant?
+  icons     PlantIcon[]
 }
 
 model Article {
@@ -431,4 +434,29 @@ model ArticlePhoto {
   uploadedById Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model PlantIcon {
+  id        Int           @id @default(autoincrement())
+  plant     Plant         @relation(fields: [plantId], references: [id])
+  plantId   Int
+  user      User          @relation(fields: [userId], references: [id])
+  userId    Int
+  version   Int
+  jsonPath  String
+  imagePath String
+  status    IconStatus    @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  approvedAt DateTime?
+  approvedBy User?        @relation("IconApprovals", fields: [approvedById], references: [id])
+  approvedById Int?
+
+  @@unique([plantId, version])
+}
+
+enum IconStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
