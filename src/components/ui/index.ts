@@ -18,3 +18,4 @@ export { default as Slider } from './slider';
 export { Toast, Toaster } from './toast';
 export * from './card';
 export { ImageUpload } from './image-upload';
+export { default as Pagination } from './pagination'
