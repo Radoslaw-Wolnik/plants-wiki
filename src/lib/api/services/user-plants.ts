@@ -1,6 +1,6 @@
 // src/lib/api/services/user-plants.ts
 import { apiClient } from '../client';
-import { WateringLog, FertilizingLog, UserPlant } from '../types/user-plant';
+import { WateringLog, FertilizingLog, UserPlant } from '@/types';
 
 export async function getUserPlantById(plantId: number) {
   const { data } = await apiClient.get<UserPlant>(`/users/library/plants/${plantId}`);
