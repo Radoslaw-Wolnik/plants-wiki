@@ -1,8 +1,8 @@
 // src/contexts/AuthContext.tsx
 import { createContext, useContext } from 'react';
-import { SafeUser } from '@/types/global';
+import { SafeUser } from '@/types';
 
-import { AuthContext, AuthContextType } from '../contexts/AuthContext';
+import { AuthContext, AuthContextType } from '../../../contexts/AuthContext';
 
 // Custom hook for using auth context
 export function useAuth() {

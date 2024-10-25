@@ -1,7 +1,7 @@
 // src/hooks/useFriends.ts
 import { useApi } from '@/hooks/useApi';
 import { User } from '@/types/global';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/hooks/ui/useToast';
 
 interface FriendRequest {
   id: number;

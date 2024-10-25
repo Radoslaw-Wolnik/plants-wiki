@@ -5,7 +5,7 @@ import React, { useEffect } from 'react';
 import { DashboardStats } from '@/components/features/admin/DashboardStats';
 import { UserManagement } from '@/components/features/admin/UserManagement';
 import { RecentActions } from '@/components/features/admin/RecentActions';
-import { useAdminDashboard } from '@/hooks/useAdminDashboard';
+import { useAdminDashboard } from '@/hooks/features/admin/useAdminDashboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { Alert } from '@/components/ui';
 import { redirect } from 'next/navigation';

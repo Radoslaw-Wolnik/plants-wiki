@@ -4,7 +4,7 @@
 import React, { useEffect } from 'react';
 import { PlantFilters } from '@/components/features/plants/PlantFilters';
 import { PlantGrid } from '@/components/features/plants/PlantGrid';
-import { usePlantBrowser } from '@/hooks/usePlantBrowser';
+import { usePlantBrowser } from '@/hooks/features/plants/usePlantBrowser';
 import { Button, Alert, Pagination } from '@/components/ui';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';

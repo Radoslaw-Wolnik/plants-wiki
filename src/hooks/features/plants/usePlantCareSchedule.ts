@@ -1,7 +1,7 @@
 // src/hooks/usePlantCareSchedule.ts
 import { useApi } from '@/hooks/useApi';
 import { CalendarEvent } from '@/types/global';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/hooks/ui/useToast';
 
 interface CareSchedule {
   plantId: number;

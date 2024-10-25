@@ -1,8 +1,8 @@
 // src/components/features/users/UserProfileView.tsx
 import React from 'react';
 import { Card, Badge, Button, Avatar, Alert } from '@/components/ui';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import { useFriends } from '@/hooks/useFriends';
+import { useUserProfile } from '@/hooks/features/users/useUserProfile';
+import { useFriends } from '@/hooks/features/users/useFriends';
 import Link from 'next/link';
 import { UserSquare, Book, Flower, Users } from 'lucide-react';
 

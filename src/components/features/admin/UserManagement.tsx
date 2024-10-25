@@ -1,7 +1,7 @@
 // src/components/features/admin/UserManagement.tsx
 import React from 'react';
 import { Card, Input, Select, Button, Badge } from '@/components/ui';
-import { useAdminUsers } from '@/hooks/useAdminUsers';
+import { useAdminUsers } from '@/hooks/features/admin/useAdminUsers';
 import { Search, MoreVertical } from 'lucide-react';
 import { formatDate } from '@/utils/general.util';
 

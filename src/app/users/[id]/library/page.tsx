@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { useParams } from 'next/navigation';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUserProfile } from '@/hooks/features/users/useUserProfile';
 import { PlantList } from '@/components/features/plants/PlantList';
 import { Alert } from '@/components/ui';
 

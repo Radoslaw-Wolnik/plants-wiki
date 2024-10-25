@@ -1,7 +1,7 @@
 // src/components/features/friends/FriendsList.tsx
 import React from 'react';
 import { Card, Button, Avatar } from '@/components/ui';
-import { useFriends } from '@/hooks/useFriends';
+import { useFriends } from '@/hooks/features/users/useFriends';
 import Link from 'next/link';
 
 export const FriendsList: React.FC = () => {

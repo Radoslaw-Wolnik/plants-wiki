@@ -1,7 +1,7 @@
 // src/components/features/moderation/ModerationDashboard.tsx
 import React from 'react';
 import { Card, Button, Badge, Tabs } from '@/components/ui';
-import { useModeration } from '@/hooks/useModeration';
+import { useModeration } from '@/hooks/features/moderation/useModeration';
 import { Shield, Flag, AlertTriangle } from 'lucide-react';
 
 export const ModerationDashboard: React.FC = () => {

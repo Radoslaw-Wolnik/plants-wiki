@@ -1,7 +1,7 @@
 // src/hooks/useDiscussions.ts
 import { useApi } from '@/hooks/useApi';
 import { Discussion } from '@/types/global';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/hooks/ui/useToast';
 
 export function useDiscussions(articleId: number) {
   const toast = useToast();

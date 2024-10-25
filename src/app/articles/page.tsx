@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useArticles } from '@/hooks/useArticles';
+import { useArticles } from '@/hooks/features/articles/useArticles';
 import { Card, Input, Button, Pagination } from '@/components/ui';
 import { Search, Plus } from 'lucide-react';
 import Link from 'next/link';

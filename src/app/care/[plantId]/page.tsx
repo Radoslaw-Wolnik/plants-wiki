@@ -5,8 +5,8 @@ import React from 'react';
 import { useParams } from 'next/navigation';
 import { CareScheduleForm } from '@/components/features/care/CareScheduleForm';
 import { PlantCareLog } from '@/components/features/plants/PlantCareLog';
-import { usePlantCare } from '@/hooks/usePlantCare';
-import { useUserPlants } from '@/hooks/useUserPlants';
+import { usePlantCare } from '@/hooks/features/plants/usePlantCare';
+import { useUserPlants } from '@/hooks/features/plants/useUserPlants';
 import { Card, Alert } from '@/components/ui';
 
 export default function PlantCareDetailPage() {

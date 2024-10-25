@@ -1,7 +1,7 @@
 // src/components/features/discussions/DiscussionThread.tsx
 import React, { useState } from 'react';
 import { Card, Button, Textarea, Avatar } from '@/components/ui';
-import { useDiscussions } from '@/hooks/useDiscussions';
+import { useDiscussions } from '@/hooks/features/articles/useDiscussions';
 import { formatDate } from '@/utils/general.util';
 import { useAuth } from '@/contexts/AuthContext';
 

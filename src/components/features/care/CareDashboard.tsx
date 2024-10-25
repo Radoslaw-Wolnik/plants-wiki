@@ -4,8 +4,8 @@ import { CareScheduleForm } from './CareScheduleForm';
 import { CareRemindersWidget } from './CareRemindersWidget';
 import { PlantCareLog } from '../plants/PlantCareLog';
 import { Tabs } from '@/components/ui';
-import { useUserPlants } from '@/hooks/useUserPlants';
-import { usePlantCare } from '@/hooks/usePlantCare';
+import { useUserPlants } from '@/hooks/features/plants/useUserPlants';
+import { usePlantCare } from '@/hooks/features/plants/usePlantCare';
 
 export const CareDashboard: React.FC = () => {
   const { userPlants } = useUserPlants();

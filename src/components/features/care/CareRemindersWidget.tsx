@@ -1,7 +1,7 @@
 // src/components/features/care/CareRemindersWidget.tsx
 import React from 'react';
 import { Card, Badge } from '@/components/ui';
-import { useCareReminders } from '@/hooks/useCareReminders';
+import { useCareReminders } from '@/hooks/features/plants/useCareReminders';
 import { CalendarEvent } from '@/types/global';
 import { formatDate } from '@/utils/general.util';
 import { Droplet, Flower } from 'lucide-react';

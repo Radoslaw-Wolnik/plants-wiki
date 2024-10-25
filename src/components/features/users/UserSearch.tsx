@@ -1,7 +1,7 @@
 // src/components/features/users/UserSearch.tsx
 import React from 'react';
 import { Card, Input, Avatar } from '@/components/ui';
-import { useUserSearch } from '@/hooks/useUserSearch';
+import { useUserSearch } from '@/hooks/features/users/useUserSearch';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 

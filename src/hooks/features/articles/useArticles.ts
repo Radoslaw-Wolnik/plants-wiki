@@ -1,7 +1,7 @@
 // src/hooks/useArticles.ts
 import { useApi } from '@/hooks/useApi';
 import { Article, PaginatedResponse } from '@/types/global';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/hooks/ui/useToast';
 
 export function useArticles(params?: { 
   page?: number; 

@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useArticleEditor } from '@/hooks/useArticleEditor';
+import { useArticleEditor } from '@/hooks/features/articles/useArticleEditor';
 import { ArticleEditor } from '@/components/features/articles/ArticleEditor';
 import { Alert, Card, Tabs } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';

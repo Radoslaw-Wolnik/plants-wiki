@@ -3,7 +3,7 @@
 
 import React, { useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { useArticleEditor } from '@/hooks/useArticleEditor';
+import { useArticleEditor } from '@/hooks/features/articles/useArticleEditor';
 import { ArticleViewer } from '@/components/features/articles/ArticleViewer';
 import { Alert, Spinner } from '@/components/ui';
 

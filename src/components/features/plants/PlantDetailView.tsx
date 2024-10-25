@@ -1,7 +1,7 @@
 // src/components/features/plants/PlantDetailView.tsx
 import React from 'react';
 import { Card, Button, Tabs } from '@/components/ui';
-import { usePlantDetails } from '@/hooks/usePlantDetails';
+import { usePlantDetails } from '@/hooks/features/plants/usePlantDetails';
 import { Plant } from '@/types/global';
 import {
   Sun,

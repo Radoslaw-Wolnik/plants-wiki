@@ -1,7 +1,7 @@
 // src/hooks/useProfile.ts
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/hooks/ui/useToast';
 import { User } from '@/types/global';
 
 interface ProfileStats {

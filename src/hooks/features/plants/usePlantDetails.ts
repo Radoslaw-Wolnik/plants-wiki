@@ -1,7 +1,7 @@
 // src/hooks/usePlantDetails.ts
 import { useApi } from '@/hooks/useApi';
 import { Plant, CareTip } from '@/types/global';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/hooks/ui/useToast';
 
 export function usePlantDetails(plantId: number) {
   const { data: plant, isLoading, error, get: refreshPlant } = 

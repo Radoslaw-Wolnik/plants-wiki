@@ -4,7 +4,7 @@
 import React from 'react';
 import { useParams } from 'next/navigation';
 import { PlantDetailView } from '@/components/features/plants/PlantDetailView';
-import { usePlantDetails } from '@/hooks/usePlantDetails';
+import { usePlantDetails } from '@/hooks/features/plants/usePlantDetails';
 import { Alert, Card, Button } from '@/components/ui';
 import Image from 'next/image';
 import Link from 'next/link';

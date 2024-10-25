@@ -5,7 +5,7 @@ import React from 'react';
 import { GraveyardItem } from '@/components/features/collections/GraveyardItem';
 import { Button, Alert } from '@/components/ui';
 import { Plus } from 'lucide-react';
-import { useGraveyard } from '@/hooks/useGraveyard';
+import { useGraveyard } from '@/hooks/features/plants/useGraveyard';
 import { useAuth } from '@/contexts/AuthContext';
 import { redirect } from 'next/navigation';
 

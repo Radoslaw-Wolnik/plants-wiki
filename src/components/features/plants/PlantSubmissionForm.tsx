@@ -12,7 +12,7 @@ import {
   Button,
   Alert 
 } from '@/components/ui';
-import { usePlantSubmission } from '@/hooks/usePlantSubmission';
+import { usePlantSubmission } from '@/hooks/features/plants/usePlantSubmission';
 
 const plantSubmissionSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),

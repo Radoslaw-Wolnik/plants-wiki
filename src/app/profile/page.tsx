@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { Card, Button, Avatar, Input, Tabs, Alert } from '@/components/ui';
-import { useProfile } from '@/hooks/useProfile';
+import { useProfile } from '@/hooks/features/auth/useProfile';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { Pencil, Plant, Book, Heart, Skull } from 'lucide-react';
 import Link from 'next/link';

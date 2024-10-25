@@ -1,7 +1,7 @@
 // src/components/features/care/CareScheduleForm.tsx
 import React from 'react';
 import { Card, Input, Button, Alert } from '@/components/ui';
-import { usePlantCareSchedule } from '@/hooks/usePlantCareSchedule';
+import { usePlantCareSchedule } from '@/hooks/features/plants/usePlantCareSchedule';
 import { formatDate } from '@/utils/general.util';
 
 interface CareScheduleFormProps {

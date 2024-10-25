@@ -1,7 +1,7 @@
 // src/components/features/friends/FriendRequests.tsx
 import React from 'react';
 import { Card, Button, Avatar } from '@/components/ui';
-import { useFriends } from '@/hooks/useFriends';
+import { useFriends } from '@/hooks/features/users/useFriends';
 
 export const FriendRequests: React.FC = () => {
   const { friendRequests, respondToRequest, isLoading } = useFriends();

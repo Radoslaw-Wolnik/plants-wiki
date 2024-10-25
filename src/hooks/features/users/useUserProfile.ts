@@ -1,7 +1,7 @@
 // src/hooks/useUserProfile.ts
 import { useApi } from '@/hooks/useApi';
 import { User, UserLibrary, UserPlantPhoto } from '@/types/global';
-import { useFriends } from '@/hooks/useFriends';
+import { useFriends } from '@/hooks/features/users/useFriends';
 
 interface UserProfile extends User {
   library?: UserLibrary;

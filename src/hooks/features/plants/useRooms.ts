@@ -1,7 +1,7 @@
 // src/hooks/useRooms.ts
 import { useApi } from '@/hooks/useApi';
 import { Room } from '@/types/global';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/hooks/ui/useToast';
 
 export function useRooms() {
   const { data, error, isLoading, get, post, put, delete: del } = 

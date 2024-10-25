@@ -4,7 +4,7 @@
 import React from 'react';
 import { useParams } from 'next/navigation';
 import { RevisionHistory } from '@/components/features/articles/RevisionHistory';
-import { useArticleEditor } from '@/hooks/useArticleEditor';
+import { useArticleEditor } from '@/hooks/features/articles/useArticleEditor';
 import { Alert } from '@/components/ui';
 
 export default function ArticleHistoryPage() {

@@ -1,7 +1,7 @@
 // src/hooks/useWishlist.ts
 import { useApi } from '@/hooks/useApi';
 import { WishlistItem } from '@/types/global';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/hooks/ui/useToast';
 
 export function useWishlist() {
   const { data, error, isLoading, get, post, delete: del } = 
