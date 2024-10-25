@@ -5,8 +5,9 @@ import React, { useState } from 'react';
 import { Card, Button, Avatar, Input, Tabs, Alert } from '@/components/ui';
 import { useProfile } from '@/hooks/features/auth/useProfile';
 import { ImageUpload } from '@/components/ui/image-upload';
-import { Pencil, Plant, Book, Heart, Skull } from 'lucide-react';
+import { Pencil, Leaf, Book, Heart, Skull } from 'lucide-react';
 import Link from 'next/link';
+import StatCard from '@/components/features/profile/StatCard';
 
 export default function ProfilePage() {
   const { user, stats, updateProfile } = useProfile();
@@ -37,7 +38,7 @@ export default function ProfilePage() {
       content: (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <StatCard
-            icon={<Plant className="h-5 w-5 text-primary-500" />}
+            icon={<Leaf className="h-5 w-5 text-primary-500" />}
             label="Active Plants"
             value={stats.activePlants}
             linkTo="/library"

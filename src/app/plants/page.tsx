@@ -8,7 +8,7 @@ import { usePlantBrowser } from '@/hooks/features/plants/usePlantBrowser';
 import { Button, Alert, Pagination } from '@/components/ui';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks';
 
 export default function PlantsPage() {
   const { 

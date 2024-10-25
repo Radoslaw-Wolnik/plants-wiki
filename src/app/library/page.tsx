@@ -3,9 +3,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useUserPlants, usePlantCare } from '@/hooks';
-import { PlantList, PlantCareLog, PlantRoomCard } from '@/components/features/plants';
+import { PlantList } from '@/components/features/plants/PlantList';
+import { PlantCareLog } from '@/components/features/plants/PlantCareLog';
+import { PlantRoomCard } from '@/components/features/plants/PlantRoomCard';
 import { Tabs, Button, Alert } from '@/components/ui';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks';
 import { Plus } from 'lucide-react';
 
 export default function PlantLibraryPage() {

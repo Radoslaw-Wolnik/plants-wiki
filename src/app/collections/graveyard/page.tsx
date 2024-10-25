@@ -1,12 +1,12 @@
 // src/app/collections/graveyard/page.tsx
 'use client';
 
-import React from 'react';
+import React, {useState} from 'react';
 import { GraveyardItem } from '@/components/features/collections/GraveyardItem';
 import { Button, Alert } from '@/components/ui';
 import { Plus } from 'lucide-react';
 import { useGraveyard } from '@/hooks/features/plants/useGraveyard';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks';
 import { redirect } from 'next/navigation';
 
 export default function GraveyardPage() {

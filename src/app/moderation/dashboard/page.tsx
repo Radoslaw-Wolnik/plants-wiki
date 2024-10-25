@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { ModerationDashboard } from '@/components/features/moderation/ModerationDashboard';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks';
 import { Alert } from '@/components/ui';
 import { redirect } from 'next/navigation';
 

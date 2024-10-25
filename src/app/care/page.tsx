@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { CareDashboard } from '@/components/features/care/CareDashboard';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks';
 import { redirect } from 'next/navigation';
 
 export default function PlantCarePage() {

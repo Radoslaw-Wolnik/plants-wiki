@@ -5,9 +5,8 @@ import React from 'react';
 import { useParams } from 'next/navigation';
 import { Card, Alert, Button } from '@/components/ui';
 import { ChangeRequestViewer } from '@/components/features/articles/ChangeRequestViewer';
-import { useAuth } from '@/contexts/AuthContext';
-import { useApi } from '@/hooks/useApi';
-import { ChangeRequest } from '@/types/global';
+import { useAuth, useApi } from '@/hooks';
+import { ChangeRequest } from '@/types';
 
 export default function ChangeRequestsPage() {
   const { id } = useParams();

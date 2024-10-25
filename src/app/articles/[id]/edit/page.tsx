@@ -6,7 +6,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { useArticleEditor } from '@/hooks/features/articles/useArticleEditor';
 import { ArticleEditor } from '@/components/features/articles/ArticleEditor';
 import { Alert, Card, Tabs } from '@/components/ui';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks';
+import { Spinner } from '@/components/ui';
+
 
 export default function ArticleEditPage() {
   const { id } = useParams();

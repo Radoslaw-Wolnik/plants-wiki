@@ -6,7 +6,8 @@ import { useArticles } from '@/hooks/features/articles/useArticles';
 import { Card, Input, Button, Pagination } from '@/components/ui';
 import { Search, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks';
+import { PublicUser } from '@/types';
 
 export default function ArticlesPage() {
   const [page, setPage] = useState(1);
@@ -61,7 +62,7 @@ export default function ArticlesPage() {
                 <h2 className="text-xl font-semibold mb-2">{article.title}</h2>
                 <div className="flex items-center text-sm text-neutral-600 space-x-4">
                   <span>Last updated: {new Date(article.updatedAt).toLocaleDateString()}</span>
-                  <span>By: {article.contributors.map(c => c.username).join(', ')}</span>
+                  <span>By: {article.contributors.map((c: PublicUser) => c.username).join(', ')}</span>
                 </div>
               </Card>
             </Link>

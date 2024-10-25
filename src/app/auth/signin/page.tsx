@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { Card, Input, Button, Alert } from '@/components/ui';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Lock, Mail } from 'lucide-react';

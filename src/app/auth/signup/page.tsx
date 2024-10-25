@@ -6,7 +6,7 @@ import { Card, Input, Button, Alert } from '@/components/ui';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { User, Mail, Lock } from 'lucide-react';
-import { useApi } from '@/hooks/useApi';
+import { useApi } from '@/hooks';
 
 interface SignUpData {
   username: string;

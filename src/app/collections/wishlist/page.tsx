@@ -7,7 +7,7 @@ import { AddToWishlistDialog } from '@/components/features/collections/AddToWish
 import { Button, Alert } from '@/components/ui';
 import { Plus } from 'lucide-react';
 import { useWishlist } from '@/hooks/features/plants/useWishlist';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks';
 import { redirect } from 'next/navigation';
 
 export default function WishlistPage() {
