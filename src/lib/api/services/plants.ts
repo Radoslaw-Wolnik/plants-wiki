@@ -1,7 +1,6 @@
 // src/lib/api/services/plants.ts
 import { apiClient } from '../client';
-import { Plant, PlantVerification } from '../types/plant';
-import { PaginatedResponse, PaginationParams } from '../types/common';
+import { Plant, PlantVerification, PaginatedResponse, PaginationParams } from '@/types';
 
 export async function getAllPlants(params: PaginationParams) {
   const { data } = await apiClient.get<PaginatedResponse<Plant>>('/plants', { params });

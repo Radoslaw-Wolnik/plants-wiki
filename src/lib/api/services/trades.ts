@@ -1,6 +1,6 @@
 // src/lib/api/services/trades.ts
 import { apiClient } from '../client';
-import { UserPlant } from '../types/user-plant';
+import { UserPlant } from '@/types';
 
 interface TradeOffer {
   id: number;

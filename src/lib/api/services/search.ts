@@ -1,8 +1,6 @@
 // src/lib/api/services/search.ts
 import { apiClient } from '../client';
-import { Plant } from '../types/plant';
-import { Article } from '../types/article';
-import { User } from '@/types/global';
+import { Plant, Article, User } from '@/types';
 
 interface SearchResults {
   plants: Plant[];

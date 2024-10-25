@@ -1,5 +1,5 @@
 import { apiClient } from '../client';
-import { LoginCredentials, RegisterCredentials, AuthResponse } from '../types/auth';
+import { LoginCredentials, RegisterCredentials, AuthResponse } from '@/types';
 
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
   const { data } = await apiClient.post<AuthResponse>('/auth/signin', credentials);

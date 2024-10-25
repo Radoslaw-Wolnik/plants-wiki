@@ -1,5 +1,5 @@
 // src/lib/api/services/rooms.ts
-import { Room } from '../types/room';
+import { Room } from '@/types';
 import { apiClient } from '../client';
 
 export async function getAllRooms() {

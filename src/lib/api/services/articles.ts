@@ -1,7 +1,6 @@
 // src/lib/api/services/articles.ts
 import { apiClient } from '../client';
-import { Article, Comment, Discussion, ArticlePhoto } from '../types/articles';
-import { PaginatedResponse, PaginationParams } from '../types/common';
+import { PaginatedResponse, PaginationParams, Article, ArticlePhoto, Discussion } from '@/types';
 
 export async function getAllArticles(params: PaginationParams) {
   const { data } = await apiClient.get<PaginatedResponse<Article>>('/articles', { params });

@@ -1,11 +1,10 @@
 // src/lib/api/services/users.ts
 import { apiClient } from '../client';
 import { 
-    UserProfile, 
-    WishlistItem, 
-    GraveyardItem, 
-    CalendarEvent 
-  } from '../types/users';
+  UserProfileResponse as UserProfile, 
+  WishlistItemResponse as WishlistItem, 
+  GraveyardItemResponse as GraveyardItem 
+} from '@/types';
   
 export async function getUserProfile(userId: number) {
   const { data } = await apiClient.get<UserProfile>(`/users/${userId}`);
@@ -61,13 +60,6 @@ export async function addToGraveyard(graveyardData: {
 
 export async function removeFromGraveyard(itemId: number) {
   await apiClient.delete(`/users/graveyard?id=${itemId}`);
-}
-
-export async function getCalendarEvents(startDate: string, endDate: string) {
-  const { data } = await apiClient.get<CalendarEvent[]>('/users/calendar', {
-    params: { startDate, endDate },
-  });
-  return data;
 }
 
 export async function getFriends() {
