@@ -1,6 +1,6 @@
 // LayerManager.tsx
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui';
 import { Eye, EyeOff } from 'lucide-react';
 
 interface Layer {

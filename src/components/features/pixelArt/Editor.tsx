@@ -4,7 +4,7 @@ import { Toolbar } from './Toolbar';
 import { LayerManager } from './LayerManager';
 import AdvancedColorPicker from './AdvancedColorPicker';
 import type { Layer, ProjectData } from '../../../types/image-editor';
-import { Slider } from '@/components/ui/slider';
+import { Slider } from '@/components/ui';
 import {saveToLocal, saveToServer, loadFromLocal, loadFromServer } from '../../../utils/image-editor.util'
 // npm install react-color lucide-react @radix-ui/react-tooltip @radix-ui/react-slider
 
@@ -23,9 +23,11 @@ interface PixelArtEditorProps {
   onSave: (imageData: string, layers: Layer[]) => void;
   onLoad: (projectData: { layers: Layer[] }) => void;
   libraryImages: string[];
+  plantId: number;
+  userId: number;
 }
 
-const PixelArtEditor: React.FC<PixelArtEditorProps> = ({ onSave, onLoad, libraryImages }) => {
+const PixelArtEditor: React.FC<PixelArtEditorProps> = ({ onSave, onLoad, libraryImages, plantId, userId }) => {
   const [layers, setLayers] = useState<Layer[]>([DEFAULT_LAYER]);
   const [currentLayer, setCurrentLayer] = useState(0);
   const [color, setColor] = useState('#000000');
@@ -265,7 +267,7 @@ const PixelArtEditor: React.FC<PixelArtEditorProps> = ({ onSave, onLoad, library
     const imageData = canvas.toDataURL('image/png');
     
     try {
-      await saveToServer(imageData, layers);
+      await saveToServer(imageData, layers, plantId, userId);
     } catch (error) {
       console.error('Error saving to server:', error);
       // Add user feedback here
@@ -274,7 +276,7 @@ const PixelArtEditor: React.FC<PixelArtEditorProps> = ({ onSave, onLoad, library
   
   const handleLoadServer = async (version: string) => {
     try {
-      const projectData = await loadFromServer(version);
+      const projectData = await loadFromServer(plantId, parseInt(version));
       setLayers(projectData.layers);
       setCurrentLayer(0);
     } catch (error) {

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, Button, Textarea, Avatar } from '@/components/ui';
 import { useDiscussions } from '@/hooks/features/articles/useDiscussions';
 import { formatDate } from '@/utils/general.util';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks';
 
 interface DiscussionThreadProps {
   articleId: number;

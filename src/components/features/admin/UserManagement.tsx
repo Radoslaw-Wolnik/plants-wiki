@@ -1,38 +1,43 @@
-// src/components/features/admin/UserManagement.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, Input, Select, Button, Badge } from '@/components/ui';
-import { useAdminUsers } from '@/hooks/features/admin/useAdminUsers';
+import { useAdminUsers } from '@/hooks';
 import { Search, MoreVertical } from 'lucide-react';
 import { formatDate } from '@/utils/general.util';
-import { useApi } from '@/hooks';
-import { AdminUser } from '@/types';
+import { User, UserRole, AdminUser } from '@/types';
 
 interface Filters {
-  search: string;
   role: string;
   status: string;
+  search: string;
 }
 
 export const UserManagement: React.FC = () => {
-  const { users, isLoading, error, get } = useApi<AdminUser[]>('/admin/users');
-  const [filters, setFilters] = useState<Filters>({
-    search: '',
-    role: '',
-    status: '',
-  });
-
-  const handleChange = (key: keyof Filters) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: e.target.value
-    }));
-  };
+  const { users, isLoading, filters, setFilters, fetchUsers } = useAdminUsers();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     fetchUsers();
+  };
+
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilters(prev => ({
+      ...prev,
+      search: e.target.value,
+    }));
+  };
+
+  const handleRoleChange = (value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      role: value,
+    }));
+  };
+
+  const handleStatusChange = (value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      status: value,
+    }));
   };
 
   return (
@@ -44,18 +49,12 @@ export const UserManagement: React.FC = () => {
             <Input
               placeholder="Search users..."
               value={filters.search}
-              onChange={(e) => setFilters(prev => ({
-                ...prev,
-                search: e.target.value,
-              }))}
+              onChange={handleSearchInput}
               leftIcon={<Search className="h-4 w-4" />}
             />
             <Select
               value={filters.role}
-              onChange={(e) => setFilters(prev => ({
-                ...prev,
-                role: e.target.value,
-              }))}
+              onChange={handleRoleChange}
               options={[
                 { value: '', label: 'All Roles' },
                 { value: 'USER', label: 'Users' },
@@ -65,10 +64,7 @@ export const UserManagement: React.FC = () => {
             />
             <Select
               value={filters.status}
-              onChange={(e) => setFilters(prev => ({
-                ...prev,
-                status: e.target.value,
-              }))}
+              onChange={handleStatusChange}
               options={[
                 { value: '', label: 'All Status' },
                 { value: 'active', label: 'Active' },
@@ -86,7 +82,7 @@ export const UserManagement: React.FC = () => {
               <div key={i} className="h-16 bg-neutral-100 rounded-lg animate-pulse" />
             ))
           ) : (
-            users.map((user) => (
+            users.map((user: AdminUser) => (
               <div
                 key={user.id}
                 className="border rounded-lg p-4 flex items-center justify-between"

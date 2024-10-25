@@ -1,7 +1,7 @@
 // src/hooks/features/users/useUserSearch.ts
 import { useApi } from '@/hooks/api/useApi';
 import { useDebounce } from '@/hooks/utils/useDebounce';
-import { User, QueryParams } from '@/types';
+import { User, QueryParams, UserProfileResponse } from '@/types';
 import { useState, useEffect } from 'react';
 
 interface SearchFilters extends QueryParams {
@@ -12,7 +12,7 @@ interface SearchFilters extends QueryParams {
 export function useUserSearch() {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 300);
-  const { data, isLoading, error, get } = useApi<User[]>('/users/search');
+  const { data, isLoading, error, get } = useApi<UserProfileResponse[]>('/users/search');
 
   useEffect(() => {
     if (debouncedSearch) {

@@ -1,9 +1,8 @@
 // src/components/features/care/CareDashboard.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { CareScheduleForm } from './CareScheduleForm';
-import { CareRemindersWidget } from './CareRemindersWidget';
 import { PlantCareLog } from '../plants/PlantCareLog';
-import { Tabs } from '@/components/ui';
+import { Tabs, Alert } from '@/components/ui';
 import { useUserPlants } from '@/hooks/features/plants/useUserPlants';
 import { usePlantCare } from '@/hooks/features/plants/usePlantCare';
 
@@ -51,7 +50,6 @@ export const CareDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <CareRemindersWidget />
       {renderTabs()}
     </div>
   );

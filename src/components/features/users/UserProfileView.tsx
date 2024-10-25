@@ -1,10 +1,9 @@
-// src/components/features/users/UserProfileView.tsx
 import React from 'react';
 import { Card, Badge, Button, Avatar, Alert } from '@/components/ui';
-import { useUserProfile } from '@/hooks/features/users/useUserProfile';
-import { useFriends } from '@/hooks/features/users/useFriends';
+import { useUserProfile, useFriends } from '@/hooks';
+import { UserProfileResponse } from '@/types/api/users';
 import Link from 'next/link';
-import { UserSquare, Book, Flower, Users } from 'lucide-react';
+import { Book, Flower, Users } from 'lucide-react';
 
 interface UserProfileViewProps {
   userId: number;
@@ -65,11 +64,6 @@ export const UserProfileView: React.FC<UserProfileViewProps> = ({ userId }) => {
               <p className="text-sm text-neutral-600">Friends</p>
             </div>
             <div className="text-center">
-              <Flower className="h-6 w-6 mx-auto text-primary-500" />
-              <p className="mt-1 font-medium">{profile._count.plants}</p>
-              <p className="text-sm text-neutral-600">Plants</p>
-            </div>
-            <div className="text-center">
               <Book className="h-6 w-6 mx-auto text-primary-500" />
               <p className="mt-1 font-medium">{profile._count.articles}</p>
               <p className="text-sm text-neutral-600">Articles</p>
@@ -77,33 +71,6 @@ export const UserProfileView: React.FC<UserProfileViewProps> = ({ userId }) => {
           </div>
         </div>
       </Card>
-
-      {canViewLibrary ? (
-        <Card>
-          <div className="p-6">
-            <h3 className="text-xl font-semibold mb-4">Plant Library</h3>
-            {profile.library?.userPlants.map((plant) => (
-              <div
-                key={plant.id}
-                className="border-b last:border-b-0 py-3"
-              >
-                <p className="font-medium">{plant.plant.name}</p>
-                {plant.nickname && (
-                  <p className="text-sm text-neutral-600">
-                    Nicknamed: {plant.nickname}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
-      ) : (
-        <Card className="p-6">
-          <p className="text-center text-neutral-600">
-            Add {profile.username} as a friend to view their plant library
-          </p>
-        </Card>
-      )}
     </div>
   );
 };

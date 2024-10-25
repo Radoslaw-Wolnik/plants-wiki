@@ -1,7 +1,6 @@
 // ToolbarButton.tsx
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Tooltip } from '@/components/ui/tooltip';
+import { Tooltip, Button } from '@/components/ui';
 
 interface ToolbarButtonProps {
   tooltip: string;

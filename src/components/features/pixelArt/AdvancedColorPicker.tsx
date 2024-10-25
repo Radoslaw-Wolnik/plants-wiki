@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChromePicker, ColorResult } from 'react-color';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui';
 
 
 interface AdvancedColorPickerProps {

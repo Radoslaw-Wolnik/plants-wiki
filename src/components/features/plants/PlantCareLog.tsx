@@ -1,7 +1,7 @@
 // src/components/features/plants/PlantCareLog.tsx
 import React from 'react';
-import { Card, Button, Input } from '../../components/ui';
-import { WateringLog, FertilizingLog } from '@/types/api';
+import { Card, Button, Input } from '@/components/ui';
+import { WateringLog, FertilizingLog } from '@/types';
 import { formatDate } from '@/utils/general.util';
 
 interface PlantCareLogProps {

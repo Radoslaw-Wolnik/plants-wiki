@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { Button } from '../common';
+import { Button } from '@/components/ui';
 
 const Navbar: React.FC = () => {
   const { data: session } = useSession();
@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
             <>
               <NavLink href="/profile">Profile</NavLink>
               <NavLink href="/library">My Library</NavLink>
-              <Button variant="secondary" size="small" onClick={() => signOut()}>
+              <Button variant="secondary" size="sm" onClick={() => signOut()}>
                 Sign Out
               </Button>
             </>

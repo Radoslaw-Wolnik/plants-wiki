@@ -1,10 +1,5 @@
 // src/lib/api/index.ts
 export * from './client';
-export * from './types/common';
-export * from './types/plant';
-export * from './types/user-plant';
-export * from './types/article';
-export * from './types/room';
 
 // Admin exports
 export {
@@ -114,7 +109,6 @@ export {
   getGraveyard,
   addToGraveyard,
   removeFromGraveyard,
-  getCalendarEvents,
   getFriends,
   addFriend,
   removeFriend,

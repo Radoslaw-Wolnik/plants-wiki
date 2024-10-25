@@ -1,7 +1,7 @@
 // src/components/features/users/UserSearch.tsx
 import React from 'react';
 import { Card, Input, Avatar } from '@/components/ui';
-import { useUserSearch } from '@/hooks/features/users/useUserSearch';
+import { useUserSearch } from '@/hooks';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 
@@ -41,7 +41,7 @@ export const UserSearch: React.FC = () => {
                   <div>
                     <p className="font-medium">{user.username}</p>
                     <p className="text-sm text-neutral-600">
-                      {user._count?.plants || 0} plants
+                      {user.library?._count?.userPlants ?? 0} plants
                     </p>
                   </div>
                 </div>
