@@ -1,6 +1,7 @@
-// src/hooks/usePlantDetails.ts
+// usePlantDetails.ts
 import { useApi, useToast } from '@/hooks';
 import { Plant, CareTip } from '@/types';
+import { getPlantById, getPlantCareTips, createCareTip } from '@/lib/api';
 
 export function usePlantDetails(plantId: number) {
   const { data: plant, isLoading, error, get: refreshPlant } = 
@@ -8,12 +9,9 @@ export function usePlantDetails(plantId: number) {
   const { data: careTips } = useApi<CareTip[]>(`/plants/${plantId}/care-tips`);
   const toast = useToast();
 
-  const addCareTip = async (content: string) => {
+  const addCareTip = async (tipData: { title: string; content: string; }) => {
     try {
-      await fetch(`/api/plants/${plantId}/care-tips`, {
-        method: 'POST',
-        body: JSON.stringify({ content }),
-      });
+      await createCareTip(plantId, tipData);
       toast.success('Care tip added successfully');
       await refreshPlant();
     } catch (err) {

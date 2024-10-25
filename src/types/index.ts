@@ -9,3 +9,6 @@ export * from './api/users';
 export * from './admin';
 export * from './articles';
 export * from './filters';
+export * from './moderation';
+export * from './logs';
+export * from './care';

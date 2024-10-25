@@ -1,6 +1,7 @@
-// src/hooks/usePlantSubmission.ts
+// usePlantSubmission.ts
 import { PlantVerification } from '@/types';
 import { useApi, useToast } from '@/hooks';
+import { submitPlantVerification } from '@/lib/api';
 
 interface PlantSubmissionData {
   name: string;
@@ -21,17 +22,17 @@ interface PlantSubmissionData {
 }
 
 export function usePlantSubmission() {
-  const { post, isLoading, error } = useApi<PlantVerification>('/plants/verify');
+  const { isLoading, error } = useApi<PlantVerification>('/plants/verify');
   const toast = useToast();
 
   const submitPlant = async (data: PlantSubmissionData) => {
     try {
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, value);
+        formData.append(key, String(value));
       });
 
-      const result = await post(formData);
+      const result = await submitPlantVerification(formData);
       toast.success('Plant submitted for verification successfully!');
       return result;
     } catch (err) {

@@ -1,21 +1,17 @@
-// src/hooks/useArticles.ts
-import { useApi, useToast } from '@/hooks';
-import { Article, PaginatedResponse } from '@/types';
+// useArticles.ts
+import { useApi } from '@/hooks';
+import { Article, PaginatedResponse, PaginationParams } from '@/types';
+import { getAllArticles } from '@/lib/api';
 
-export function useArticles(params?: { 
-  page?: number; 
-  limit?: number; 
-  search?: string;
-}) {
+export function useArticles(params?: PaginationParams) {
   const { data, error, isLoading, get } = 
     useApi<PaginatedResponse<Article>>('/articles');
   
-  const fetchArticles = () => {
-    const queryParams = new URLSearchParams();
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    if (params?.search) queryParams.append('search', params.search);
-    return get();
+  const fetchArticles = async () => {
+    if (params) {
+      return await getAllArticles(params);
+    }
+    return await get();
   };
 
   return {

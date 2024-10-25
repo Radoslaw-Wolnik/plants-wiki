@@ -1,23 +1,25 @@
-// src/hooks/useGraveyard.ts
+// useGraveyard.ts
 import { useApi, useToast } from '@/hooks';
-import { GraveyardPlant } from '@/types';
+import { GraveyardItemResponse } from '@/types';
+import { 
+  getGraveyard,
+  addToGraveyard as addToGraveyardApi,
+  removeFromGraveyard as removeFromGraveyardApi
+} from '@/lib/api';
 
 export function useGraveyard() {
-  const { data, error, isLoading, get, post, delete: del } = 
-    useApi<GraveyardPlant[]>('/users/graveyard');
+  const { data, error, isLoading, get } = useApi<GraveyardItemResponse[]>('/users/graveyard');
   const toast = useToast();
 
-  const addToGraveyard = async (plantData: {
+  const addToGraveyard = async (graveyardData: {
     plantName: string;
     startDate: string;
     endDate: string;
-    cause?: string;
-    notes?: string;
   }) => {
     try {
-      await post(plantData);
+      await addToGraveyardApi(graveyardData);
       toast.success('Plant added to graveyard');
-      await get();
+      await getGraveyard();
     } catch (err) {
       toast.error('Failed to add plant to graveyard');
       throw err;
@@ -26,9 +28,9 @@ export function useGraveyard() {
 
   const removeFromGraveyard = async (itemId: number) => {
     try {
-      await del();
+      await removeFromGraveyardApi(itemId);
       toast.success('Entry removed from graveyard');
-      await get();
+      await getGraveyard();
     } catch (err) {
       toast.error('Failed to remove entry');
       throw err;
@@ -41,6 +43,6 @@ export function useGraveyard() {
     removeFromGraveyard,
     isLoading,
     error,
-    refresh: get,
+    refresh: getGraveyard,
   };
 }

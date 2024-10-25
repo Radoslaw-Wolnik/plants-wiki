@@ -1,19 +1,10 @@
-// src/hooks/useUserProfile.ts
+// useUserProfile.ts
 import { useApi, useFriends } from '@/hooks';
-import { User, UserLibrary, PlantPhoto } from '@/types';
-
-interface UserProfile extends User {
-  library?: UserLibrary;
-  photos?: PlantPhoto[];
-  _count: {
-    friends: number;
-    articles: number;
-    plants: number;
-  };
-}
+import { UserProfileResponse } from '@/types';
+import { getUserProfile } from '@/lib/api';
 
 export function useUserProfile(userId: number) {
-  const { data: profile, isLoading, error } = useApi<UserProfile>(`/users/${userId}`);
+  const { data: profile, isLoading, error } = useApi<UserProfileResponse>(`/users/${userId}`);
   const { friends } = useFriends();
 
   const isFriend = friends.some(friend => friend.id === userId);

@@ -1,30 +1,26 @@
-// src/hooks/usePlants.ts
+// usePlants.ts
 import { useApi } from '@/hooks';
-import { PaginatedResponse, Plant } from '@/types';
+import { Plant, PaginatedResponse, PaginationParams } from '@/types';
+import { getAllPlants, getPlantById } from '@/lib/api';
 
-interface UsePlantsParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-}
-
-export function usePlants(params: UsePlantsParams = {}) {
-  const { data, error, isLoading, get } = useApi<PaginatedResponse<Plant>>('/plants');
+export function usePlants(params?: PaginationParams) {
+  const { data, error, isLoading, get } = 
+    useApi<PaginatedResponse<Plant>>('/plants');
 
   const fetchPlants = async () => {
-    const queryParams = new URLSearchParams();
-    if (params.page) queryParams.append('page', params.page.toString());
-    if (params.limit) queryParams.append('limit', params.limit.toString());
-    if (params.search) queryParams.append('search', params.search);
-    await get();
+    return await getAllPlants(params || {});
+  };
+
+  const fetchPlant = async (id: number) => {
+    return await getPlantById(id);
   };
 
   return {
     plants: data?.data ?? [],
-    totalPages: data?.pagination.totalPages ?? 0,
+    pagination: data?.pagination,
     isLoading,
     error,
     fetchPlants,
+    fetchPlant,
   };
 }
-

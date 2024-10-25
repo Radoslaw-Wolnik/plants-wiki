@@ -1,20 +1,24 @@
-// src/hooks/useArticleHistory.ts
+// useArticleHistory.ts
 import { useApi, useToast } from '@/hooks';
 import { ArticleRevision } from '@/types';
+import { getArticleById } from '@/lib/api';
 
 export function useArticleHistory(articleId: number) {
-  const { data, error, isLoading, get } = 
+  const { data, error, isLoading, get, post } = 
     useApi<ArticleRevision[]>(`/articles/${articleId}/history`);
   const toast = useToast();
 
   const revertToRevision = async (revisionId: number) => {
     try {
-      await fetch(`/api/articles/${articleId}/revert`, {
-        method: 'POST',
-        body: JSON.stringify({ revisionId }),
-      });
+      const formData = new FormData();
+      formData.append('revisionId', revisionId.toString());
+      
+      await post(formData);
       toast.success('Successfully reverted to previous version');
-      await get();
+      await Promise.all([
+        get(),
+        getArticleById(articleId)
+      ]);
     } catch (err) {
       toast.error('Failed to revert to selected version');
       throw err;

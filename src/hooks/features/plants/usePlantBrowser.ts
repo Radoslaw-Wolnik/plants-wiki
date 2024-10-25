@@ -1,6 +1,7 @@
-// src/hooks/usePlantBrowser.ts
+// usePlantBrowser.ts
 import { useApi } from '@/hooks';
 import { Plant, PaginatedResponse, PlantFilters } from '@/types';
+import { getAllPlants } from '@/lib/api';
 import { useState } from 'react';
 
 export function usePlantBrowser() {
@@ -9,15 +10,7 @@ export function usePlantBrowser() {
   const { data, isLoading, error, get } = useApi<PaginatedResponse<Plant>>('/plants');
 
   const fetchPlants = async () => {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      ...(filters.petSafe ? { petSafe: filters.petSafe.toString() } : {}),
-      ...(filters.light ? { light: filters.light } : {}),
-      ...(filters.difficulty ? { difficulty: filters.difficulty } : {}),
-      ...(filters.type ? { type: filters.type } : {}),
-      ...(filters.search ? { search: filters.search } : {})
-    });
-    await get(filters);
+    await getAllPlants({ ...filters, page });
   };
 
   return {

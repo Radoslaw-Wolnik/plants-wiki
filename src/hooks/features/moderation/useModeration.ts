@@ -1,6 +1,11 @@
-// src/hooks/useModeration.ts
+// useModeration.ts
 import { useApi } from '@/hooks';
 import { ModerationType } from '@/types';
+import { 
+  reviewFlag,
+  processModeratorRequest,
+  getModeratorRequests
+} from '@/lib/api';
 
 interface ModerationStats {
   pendingChangeRequests: number;
@@ -20,18 +25,12 @@ export function useModeration() {
   const queueApi = useApi<any[]>('/moderation/queue');
 
   const handleReport = async (reportId: number, action: 'approve' | 'reject', reason?: string) => {
-    await fetch(`/api/moderation/reports/${reportId}`, {
-      method: 'POST',
-      body: JSON.stringify({ action, reason }),
-    });
+    await processModeratorRequest(reportId, action);
     await Promise.all([statsApi.get(), queueApi.get()]);
   };
 
-  const handleFlag = async (flagId: number, action: 'remove' | 'keep', reason?: string) => {
-    await fetch(`/api/moderation/flags/${flagId}`, {
-      method: 'POST',
-      body: JSON.stringify({ action, reason }),
-    });
+  const handleFlag = async (flagId: number, action: 'APPROVE' | 'REJECT', strikeUser?: boolean) => {
+    await reviewFlag(flagId, action, strikeUser);
     await Promise.all([statsApi.get(), queueApi.get()]);
   };
 

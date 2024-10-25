@@ -1,22 +1,28 @@
-// src/hooks/useRooms.ts
+// useRooms.ts
 import { useApi, useToast } from '@/hooks';
 import { Room } from '@/types';
+import { 
+  getAllRooms,
+  createRoom as createRoomApi,
+  updateRoom as updateRoomApi,
+  deleteRoom as deleteRoomApi,
+  moveUserPlantToRoom
+} from '@/lib/api';
 
 export function useRooms() {
-  const { data, error, isLoading, get, post, put, delete: del } = 
-    useApi<Room[]>('/users/rooms');
+  const { data, error, isLoading, get } = useApi<Room[]>('/users/rooms');
   const toast = useToast();
 
   const createRoom = async (roomData: {
     name: string;
-    type: string;
+    type: Room['type'];
     sunlight: string;
     humidity: string;
   }) => {
     try {
-      await post(roomData);
+      await createRoomApi(roomData);
       toast.success('Room created successfully');
-      await get();
+      await getAllRooms();
     } catch (err) {
       toast.error('Failed to create room');
       throw err;
@@ -25,9 +31,9 @@ export function useRooms() {
 
   const updateRoom = async (roomId: number, updates: Partial<Room>) => {
     try {
-      await put(updates);
+      await updateRoomApi(roomId, updates);
       toast.success('Room updated successfully');
-      await get();
+      await getAllRooms();
     } catch (err) {
       toast.error('Failed to update room');
       throw err;
@@ -36,23 +42,20 @@ export function useRooms() {
 
   const deleteRoom = async (roomId: number) => {
     try {
-      await del();
+      await deleteRoomApi(roomId);
       toast.success('Room deleted successfully');
-      await get();
+      await getAllRooms();
     } catch (err) {
       toast.error('Failed to delete room');
       throw err;
     }
   };
 
-  const movePlantToRoom = async (plantId: number, roomId: number) => {
+  const movePlant = async (plantId: number, roomId: number) => {
     try {
-      await fetch(`/api/users/plants/${plantId}/move`, {
-        method: 'PUT',
-        body: JSON.stringify({ roomId }),
-      });
+      await moveUserPlantToRoom(plantId, roomId);
       toast.success('Plant moved successfully');
-      await get();
+      await getAllRooms();
     } catch (err) {
       toast.error('Failed to move plant');
       throw err;
@@ -66,7 +69,7 @@ export function useRooms() {
     createRoom,
     updateRoom,
     deleteRoom,
-    movePlantToRoom,
-    refreshRooms: get,
+    movePlantToRoom: movePlant,
+    refreshRooms: getAllRooms,
   };
 }

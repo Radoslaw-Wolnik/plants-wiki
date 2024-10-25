@@ -1,7 +1,7 @@
-// src/hooks/useArticleEditor.ts
-import { useApi } from '@/hooks';
+// useArticleEditor.ts
+import { useApi, useToast } from '@/hooks';
 import { Article, ChangeRequest } from '@/types';
-import { useToast } from '@/hooks';
+import { createArticle as createArticleApi, uploadArticlePhoto } from '@/lib/api';
 
 export function useArticleEditor(articleId?: number) {
   const toast = useToast();
@@ -14,25 +14,11 @@ export function useArticleEditor(articleId?: number) {
     plantId: number;
   }) => {
     try {
-      const result = await articleApi.post(data);
+      const result = await createArticleApi(data);
       toast.success('Article created successfully');
       return result;
     } catch (err) {
       toast.error('Failed to create article');
-      throw err;
-    }
-  };
-
-  const submitChange = async (data: {
-    content: string;
-    summary?: string;
-  }) => {
-    try {
-      const result = await changeRequestApi.post(data);
-      toast.success('Change request submitted for review');
-      return result;
-    } catch (err) {
-      toast.error('Failed to submit change request');
       throw err;
     }
   };
@@ -42,7 +28,6 @@ export function useArticleEditor(articleId?: number) {
     isLoading: articleApi.isLoading || changeRequestApi.isLoading,
     error: articleApi.error || changeRequestApi.error,
     createArticle,
-    submitChange,
     refreshArticle: articleApi.get,
   };
 }

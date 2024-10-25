@@ -1,17 +1,17 @@
-// src/hooks/useDiscussions.ts
+// useDiscussions.ts
 import { useApi, useToast } from '@/hooks';
 import { Discussion } from '@/types';
+import { createDiscussion as createDiscussionApi, getDiscussions } from '@/lib/api';
 
 export function useDiscussions(articleId: number) {
   const toast = useToast();
-  const { data, error, isLoading, get, post } = 
-    useApi<Discussion[]>(`/articles/${articleId}/discussions`);
+  const { data, error, isLoading, get } = useApi<Discussion[]>(`/articles/${articleId}/discussions`);
 
   const createDiscussion = async (content: string, parentId?: number) => {
     try {
-      await post({ content, parentId });
+      await createDiscussionApi(articleId, content, parentId);
       toast.success('Comment posted successfully');
-      await get();
+      await getDiscussions(articleId);
     } catch (err) {
       toast.error('Failed to post comment');
       throw err;
@@ -23,6 +23,6 @@ export function useDiscussions(articleId: number) {
     isLoading,
     error,
     createDiscussion,
-    refreshDiscussions: get,
+    refreshDiscussions: () => getDiscussions(articleId),
   };
 }

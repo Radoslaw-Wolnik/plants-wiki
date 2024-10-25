@@ -1,6 +1,11 @@
-// src/hooks/useFriends.ts
+// useFriends.ts
 import { useApi, useToast } from '@/hooks';
 import { User } from '@/types';
+import { 
+  getFriends,
+  addFriend as addFriendApi,
+  removeFriend as removeFriendApi
+} from '@/lib/api';
 
 interface FriendRequest {
   id: number;
@@ -11,7 +16,7 @@ interface FriendRequest {
 }
 
 export function useFriends() {
-  const { data: friends, error, isLoading, get: getFriends } = 
+  const { data: friends, error, isLoading, get: getFriendsList } = 
     useApi<User[]>('/users/friends');
   const { data: requests, get: getRequests } = 
     useApi<FriendRequest[]>('/users/friends/requests');
@@ -19,10 +24,7 @@ export function useFriends() {
 
   const sendFriendRequest = async (userId: number) => {
     try {
-      await fetch('/api/users/friends/requests', {
-        method: 'POST',
-        body: JSON.stringify({ userId }),
-      });
+      await addFriendApi(userId);
       toast.success('Friend request sent');
       await getRequests();
     } catch (err) {
@@ -33,10 +35,7 @@ export function useFriends() {
 
   const respondToRequest = async (requestId: number, accept: boolean) => {
     try {
-      await fetch(`/api/users/friends/requests/${requestId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ accept }),
-      });
+      await addFriendApi(requestId);
       toast.success(accept ? 'Friend request accepted' : 'Friend request rejected');
       await Promise.all([getFriends(), getRequests()]);
     } catch (err) {
@@ -47,9 +46,7 @@ export function useFriends() {
 
   const removeFriend = async (userId: number) => {
     try {
-      await fetch(`/api/users/friends/${userId}`, {
-        method: 'DELETE',
-      });
+      await removeFriendApi(userId);
       toast.success('Friend removed');
       await getFriends();
     } catch (err) {

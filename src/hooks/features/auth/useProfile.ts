@@ -1,6 +1,7 @@
-// src/hooks/useProfile.ts
+// useProfile.ts
 import { useApi, useAuth, useToast } from '@/hooks';
-import { User } from '@/types';
+import { UserProfileResponse } from '@/types';
+import { updateUserProfile, uploadProfilePicture } from '@/lib/api';
 
 interface ProfileStats {
   totalPlants: number;
@@ -21,15 +22,18 @@ export function useProfile() {
     profilePicture?: File;
   }) => {
     try {
-      const formData = new FormData();
-      Object.entries(updates).forEach(([key, value]) => {
-        if (value) formData.append(key, value);
-      });
+      if (updates.profilePicture) {
+        const formData = new FormData();
+        formData.append('file', updates.profilePicture);
+        await uploadProfilePicture(formData);
+      }
 
-      await fetch('/api/users/profile', {
-        method: 'PUT',
-        body: formData,
-      });
+      if (updates.username || updates.email) {
+        await updateUserProfile({
+          username: updates.username,
+          email: updates.email
+        });
+      }
       
       await refreshUser();
       toast.success('Profile updated successfully');
@@ -37,10 +41,6 @@ export function useProfile() {
       toast.error('Failed to update profile');
       throw err;
     }
-  };
-
-  const refreshStats = async () => {
-    await getStats();
   };
 
   return {
@@ -53,6 +53,6 @@ export function useProfile() {
       contributedArticles: 0,
     },
     updateProfile,
-    refreshStats,
+    refreshStats: getStats,
   };
 }

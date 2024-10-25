@@ -1,10 +1,14 @@
-// src/hooks/useWishlist.ts
+// useWishlist.ts
 import { useApi, useToast } from '@/hooks';
-import { WishlistPlant } from '@/types';
+import { WishlistItemResponse } from '@/types';
+import { 
+  getWishlist,
+  addToWishlist as addToWishlistApi,
+  removeFromWishlist as removeFromWishlistApi
+} from '@/lib/api';
 
 export function useWishlist() {
-  const { data, error, isLoading, get, post, delete: del } = 
-    useApi<WishlistPlant[]>('/users/wishlist');
+  const { data, error, isLoading, get } = useApi<WishlistItemResponse[]>('/users/wishlist');
   const toast = useToast();
 
   const addToWishlist = async (plantData: { 
@@ -13,9 +17,9 @@ export function useWishlist() {
     priority?: 'LOW' | 'MEDIUM' | 'HIGH';
   }) => {
     try {
-      await post(plantData);
+      await addToWishlistApi(plantData.plantName);
       toast.success('Added to wishlist successfully');
-      await get();
+      await getWishlist();
     } catch (err) {
       toast.error('Failed to add to wishlist');
       throw err;
@@ -24,9 +28,9 @@ export function useWishlist() {
 
   const removeFromWishlist = async (itemId: number) => {
     try {
-      await del();
+      await removeFromWishlistApi(itemId);
       toast.success('Removed from wishlist');
-      await get();
+      await getWishlist();
     } catch (err) {
       toast.error('Failed to remove from wishlist');
       throw err;
@@ -39,6 +43,6 @@ export function useWishlist() {
     removeFromWishlist,
     isLoading,
     error,
-    refresh: get,
+    refresh: getWishlist,
   };
 }

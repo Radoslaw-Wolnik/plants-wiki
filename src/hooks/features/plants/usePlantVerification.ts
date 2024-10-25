@@ -1,10 +1,11 @@
-// src/hooks/usePlantVerification.ts
+// usePlantVerification.ts
 import { useApi, useAuth } from '@/hooks';
 import { PlantVerification } from '@/types';
+import { processModeratorRequest } from '@/lib/api';
 
 export function usePlantVerification() {
   const { user } = useAuth();
-  const { data, get, put, isLoading, error } = 
+  const { data, get, isLoading, error } = 
     useApi<PlantVerification[]>('/plants/verifications');
 
   const reviewSubmission = async (
@@ -12,11 +13,7 @@ export function usePlantVerification() {
     decision: 'APPROVED' | 'REJECTED',
     feedback?: string
   ) => {
-    return await put(`${submissionId}`, {
-      status: decision,
-      feedback,
-      reviewerId: user?.id,
-    });
+    return await processModeratorRequest(submissionId, decision === 'APPROVED' ? 'approve' : 'reject');
   };
 
   return {
