@@ -1,12 +1,20 @@
-// src/components/features/articles/ChangeRequestViewer.tsx
 import React from 'react';
 import { Card, Badge, Button } from '@/components/ui';
-import { ChangeRequest } from '@/types';
+import { useUsers } from '@/hooks'; // Add this hook to fetch user info
 import { formatDate } from '@/utils/general.util';
 import { DiffViewer } from './DiffViewer';
 
 interface ChangeRequestViewerProps {
-  changeRequest: ChangeRequest;
+  changeRequest: {
+    id: number;
+    content: string;
+    createdAt: Date;
+    updatedAt: Date;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    authorId: number;
+    articleId: number;
+    previousContent?: string; // Changed from originalContent
+  };
   onApprove?: () => void;
   onReject?: () => void;
   showActions?: boolean;
@@ -18,6 +26,21 @@ export const ChangeRequestViewer: React.FC<ChangeRequestViewerProps> = ({
   onReject,
   showActions = true,
 }) => {
+  const { getUser } = useUsers(); // Hook to fetch user info
+  const [authorName, setAuthorName] = React.useState<string>('');
+
+  React.useEffect(() => {
+    const fetchAuthor = async () => {
+      try {
+        const author = await getUser(changeRequest.authorId);
+        setAuthorName(author.username);
+      } catch (err) {
+        console.error('Failed to fetch author:', err);
+      }
+    };
+    fetchAuthor();
+  }, [changeRequest.authorId, getUser]);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'APPROVED': return 'success';
@@ -40,7 +63,7 @@ export const ChangeRequestViewer: React.FC<ChangeRequestViewerProps> = ({
               </Badge>
             </div>
             <p className="text-sm text-neutral-600 mt-1">
-              Submitted by {changeRequest.author.username} on{' '}
+              Submitted by {authorName} on{' '}
               {formatDate(changeRequest.createdAt)}
             </p>
           </div>
@@ -66,7 +89,7 @@ export const ChangeRequestViewer: React.FC<ChangeRequestViewerProps> = ({
 
         <div className="border rounded-lg overflow-hidden">
           <DiffViewer
-            original={changeRequest.originalContent}
+            original={changeRequest.previousContent || ''}
             modified={changeRequest.content}
           />
         </div>

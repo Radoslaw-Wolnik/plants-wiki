@@ -5,6 +5,13 @@ import { ImageUpload } from '@/components/ui';
 import { MarkdownEditor } from './MarkdownEditor';
 import { Save } from 'lucide-react';
 
+interface ArticleContent {
+  title: string;
+  content: string;
+  plantId: number | null;
+  images: string[];
+}
+
 interface ArticleEditorProps {
   initialContent?: {
     title: string;
@@ -16,17 +23,28 @@ interface ArticleEditorProps {
 }
 
 export const ArticleEditor: React.FC<ArticleEditorProps> = ({ initialContent, onSave }) => {
-  const { content, setContent, uploadImage, saveArticle } = useArticleEditor();
+  const [content, setContent] = useState<ArticleContent>({
+    title: '',
+    content: '',
+    plantId: null,
+    images: [],
+  });
+  
+  const { uploadImage, saveArticle } = useArticleEditor();
   const { plants } = usePlants();
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize content with initialContent if provided
   useEffect(() => {
     if (initialContent) {
-      setContent(initialContent);
+      setContent({
+        title: initialContent.title,
+        content: initialContent.content,
+        plantId: initialContent.plantId || null,
+        images: initialContent.images || [],
+      });
     }
-  }, [initialContent, setContent]);
+  }, [initialContent]);
 
   const handleImageUpload = async (file: File) => {
     try {
@@ -37,10 +55,15 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({ initialContent, on
   };
 
   const handleSave = async (isDraft = false) => {
+    if (!content.plantId) {
+      setError('Please select a plant');
+      return;
+    }
+
     try {
       setIsSaving(true);
       setError(null);
-      const article = await saveArticle(); // Assume it returns an article object
+      const article = await saveArticle();
       if (article && article.id) {
         onSave(article.id);
       }
@@ -49,6 +72,13 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({ initialContent, on
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handlePlantChange = (value: string) => {
+    setContent(prev => ({
+      ...prev,
+      plantId: value ? parseInt(value, 10) : null,
+    }));
   };
 
   const tabs = [
@@ -60,7 +90,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({ initialContent, on
           <Input
             label="Title"
             value={content.title}
-            onChange={(e) => setContent((prev) => ({ ...prev, title: e.target.value }))}
+            onChange={(e) => setContent(prev => ({ ...prev, title: e.target.value }))}
             placeholder="Enter article title..."
             required
           />
@@ -68,7 +98,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({ initialContent, on
           <Select
             label="Related Plant"
             value={content.plantId?.toString() || ''}
-            onChange={(e) => setContent((prev) => ({ ...prev, plantId: e.target.value ? parseInt(e.target.value) : undefined }))}
+            onChange={handlePlantChange}
             options={[
               { value: '', label: 'Select a plant' },
               ...plants.map((plant) => ({
@@ -80,8 +110,8 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({ initialContent, on
 
           <MarkdownEditor
             value={content.content}
-            onChange={(value) => setContent((prev) => ({ ...prev, content: value }))}
-            onImageUpload={handleImageUpload} // Changed to accept a single file
+            onChange={(value) => setContent(prev => ({ ...prev, content: value }))}
+            onImageUpload={handleImageUpload}
           />
         </div>
       ),
@@ -91,11 +121,18 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({ initialContent, on
       label: 'Images',
       content: (
         <div>
-          <ImageUpload onChange={(files) => files.forEach(handleImageUpload)} multiple />
+          <ImageUpload
+            onChange={(files) => files.forEach(handleImageUpload)}
+            multiple
+          />
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            {content.images?.map((url, index) => (
+            {content.images.map((url, index) => (
               <div key={index} className="relative aspect-square">
-                <img src={url} alt={`Uploaded image ${index + 1}`} className="object-cover rounded-lg" />
+                <img
+                  src={url}
+                  alt={`Uploaded image ${index + 1}`}
+                  className="object-cover rounded-lg"
+                />
               </div>
             ))}
           </div>

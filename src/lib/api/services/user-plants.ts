@@ -1,6 +1,6 @@
 // src/lib/api/services/user-plants.ts
 import { apiClient } from '../client';
-import { WateringLog, FertilizingLog, UserPlant } from '@/types';
+import { WateringLog, FertilizingLog, UserPlant, Plant } from '@/types';
 
 export async function getUserPlantById(plantId: number) {
   const { data } = await apiClient.get<UserPlant>(`/users/library/plants/${plantId}`);
@@ -18,6 +18,10 @@ export async function createUserPlant(plantData: {
   roomId?: number;
   notes?: string;
 }) {
+  if (plantData.nickname == null){
+     const tempPlant = await apiClient.get<Plant>(`/plants/${plantData.plantId}`);
+     plantData.nickname = tempPlant.data.name
+  }
   const { data } = await apiClient.post<UserPlant>('/users/library/plants', plantData);
   return data;
 }

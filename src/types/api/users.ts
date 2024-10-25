@@ -21,3 +21,4 @@ export interface WishlistItemResponse extends Pick<WishlistPlant, 'id' | 'plantN
 export interface GraveyardItemResponse extends Pick<GraveyardPlant, 'id' | 'plantName' | 'startDate' | 'endDate'> {
   createdAt: string;
 }
+

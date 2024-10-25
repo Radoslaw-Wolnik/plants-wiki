@@ -6,6 +6,8 @@ import { Tabs, Alert } from '@/components/ui';
 import { useUserPlants } from '@/hooks/features/plants/useUserPlants';
 import { usePlantCare } from '@/hooks/features/plants/usePlantCare';
 
+
+
 export const CareDashboard: React.FC = () => {
   const { userPlants } = useUserPlants();
   const [selectedPlantId, setSelectedPlantId] = useState<number | null>(null);
@@ -22,12 +24,12 @@ export const CareDashboard: React.FC = () => {
 
     const tabs = userPlants.map(plant => ({
       id: plant.id.toString(),
-      label: plant.nickname || plant.plant.name,
+      label: plant.nickname, // 
       content: (
         <div className="space-y-6">
           <CareScheduleForm
             plantId={plant.id}
-            plantName={plant.nickname || plant.plant.name}
+            plantName={plant.nickname || "none"}
           />
           <PlantCareLog
             wateringLogs={plantCare.wateringLogs}

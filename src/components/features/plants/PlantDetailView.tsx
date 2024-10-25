@@ -10,6 +10,7 @@ import {
   Sprout,
   AlertTriangle,
 } from 'lucide-react';
+import CareTipsList from '../care/CareTipsList';
 
 interface PlantDetailViewProps {
   plant: Plant;

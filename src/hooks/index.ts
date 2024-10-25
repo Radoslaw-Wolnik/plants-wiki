@@ -51,6 +51,7 @@ export * from './features/plants/usePlants';
 export * from './features/users/useFriends';
 export * from './features/users/useUserProfile';
 export * from './features/users/useUserSearch';
+export * from './features/users/useUsers';
 
 
 

@@ -1,7 +1,8 @@
 // src/components/features/articles/ArticleViewer.tsx
 import React from 'react';
 import { Card, Badge, Button } from '@/components/ui';
-import { DiscussionThread } from '@/components/features/discussions/DiscussionThread';
+//import { DiscussionThread } from '@/components/features/discussions/DiscussionThread';
+import { DiscussionThread } from '../discussions/DiscussionsThread';
 import { Edit, MessageCircle } from 'lucide-react';
 import { Article, ArticleResponse, PublicUser } from '@/types';
 import { formatDate } from '@/utils/general.util';
