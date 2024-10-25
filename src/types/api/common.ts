@@ -1,4 +1,4 @@
-// src/lib/api/types/common.ts
+// types/api/common.ts
 export interface PaginationParams {
     page?: number;
     limit?: number;
