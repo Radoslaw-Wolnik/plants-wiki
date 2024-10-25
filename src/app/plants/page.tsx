@@ -1,45 +1,71 @@
-// src/pages/plants/page.tsx
+// src/app/plants/page.tsx
+'use client';
 
-import React, { useState, useEffect } from 'react';
-import Layout from '@/components/Layout';
-import PlantCard from '@/components/plants/PlantCard';
-import Pagination from '@/components/common/Pagination';
+import React, { useEffect } from 'react';
+import { PlantFilters } from '@/components/features/plants/PlantFilters';
+import { PlantGrid } from '@/components/features/plants/PlantGrid';
+import { usePlantBrowser } from '@/hooks/usePlantBrowser';
+import { Button, Alert, Pagination } from '@/components/ui';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
-const PlantsPage: React.FC = () => {
-  const [plants, setPlants] = useState([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState('');
+export default function PlantsPage() {
+  const { 
+    plants,
+    pagination,
+    isLoading,
+    error,
+    filters,
+    setFilters,
+    page,
+    setPage,
+    fetchPlants,
+  } = usePlantBrowser();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchPlants();
-  }, [page, search]);
-
-  const fetchPlants = async () => {
-    const response = await fetch(`/api/plants?page=${page}&search=${search}`);
-    const data = await response.json();
-    setPlants(data.plants);
-    setTotalPages(data.totalPages);
-  };
+  }, [filters, page]);
 
   return (
-    <Layout>
-      <h1 className="text-3xl font-bold mb-6">Plants</h1>
-      <input
-        type="text"
-        placeholder="Search plants..."
-        className="w-full p-2 mb-4 border rounded"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {plants.map((plant) => (
-          <PlantCard key={plant.id} plant={plant} />
-        ))}
+    <div className="container mx-auto py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Plants</h1>
+        {user?.role === 'ADMIN' && (
+          <Link href="/plants/submit">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add New Plant
+            </Button>
+          </Link>
+        )}
       </div>
-      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-    </Layout>
-  );
-};
 
-export default PlantsPage;
+      <div className="space-y-6">
+        <PlantFilters
+          filters={filters}
+          onFilterChange={setFilters}
+        />
+
+        {error ? (
+          <Alert variant="danger">
+            Failed to load plants. Please try again.
+          </Alert>
+        ) : (
+          <>
+            <PlantGrid plants={plants} />
+            
+            {pagination && (
+              <Pagination
+                currentPage={page}
+                totalPages={pagination.totalPages}
+                onPageChange={setPage}
+              />
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,4 +1,4 @@
-import PixelArtEditor from '../../components/pixelArt/Editor';
+import PixelArtEditor from '../../components/features/pixelArt/Editor';
 import { Layer } from '@/types/image-editor';
 
 function PixelArt() {

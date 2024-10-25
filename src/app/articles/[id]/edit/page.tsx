@@ -1,61 +1,59 @@
-// src/pages/articles/[id]/edit/page.tsx
+// src/app/articles/[id]/edit/page.tsx
+'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import Layout from '../../../components/Layout';
-import MarkdownEditor from '../../../components/MarkdownEditor';
-import { useSession } from 'next-auth/react';
+import React, { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useArticleEditor } from '@/hooks/useArticleEditor';
+import { ArticleEditor } from '@/components/features/articles/ArticleEditor';
+import { Alert, Card, Tabs } from '@/components/ui';
+import { useAuth } from '@/contexts/AuthContext';
 
-const ArticleEditPage: React.FC = () => {
+export default function ArticleEditPage() {
+  const { id } = useParams();
   const router = useRouter();
-  const { id } = router.query;
-  const [article, setArticle] = useState(null);
-  const [content, setContent] = useState('');
-  const { data: session } = useSession();
+  const { user } = useAuth();
+  const { article, isLoading, error, refreshArticle } = useArticleEditor(Number(id));
 
   useEffect(() => {
-    if (id) {
-      fetchArticle();
-    }
+    refreshArticle();
   }, [id]);
 
-  const fetchArticle = async () => {
-    const response = await fetch(`/api/articles/${id}`);
-    const data = await response.json();
-    setArticle(data);
-    setContent(data.content);
-  };
+  if (!user) {
+    router.push('/auth/signin');
+    return null;
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const response = await fetch(`/api/articles/${id}/change-requests`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content }),
-    });
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
-    if (response.ok) {
-      router.push(`/articles/${id}`);
-    }
-  };
-
-  if (!article) {
-    return <Layout><div>Loading...</div></Layout>;
+  if (error) {
+    return (
+      <Alert variant="danger">
+        Failed to load article. Please try again later.
+      </Alert>
+    );
   }
 
   return (
-    <Layout>
-      <h1 className="text-3xl font-bold mb-6">Edit Article: {article.title}</h1>
-      <form onSubmit={handleSubmit}>
-        <MarkdownEditor value={content} onChange={setContent} />
-        <div className="mt-4">
-          <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-            Submit for Review
-          </button>
+    <div className="container mx-auto py-8">
+      <Card className="mb-6">
+        <div className="p-6">
+          <h1 className="text-3xl font-bold">Edit Article</h1>
+          <p className="text-neutral-600 mt-2">
+            Your changes will be reviewed before being published.
+          </p>
         </div>
-      </form>
-    </Layout>
-  );
-};
+      </Card>
 
-export default ArticleEditPage;
+      <ArticleEditor
+        articleId={Number(id)}
+        initialContent={article?.content}
+      />
+    </div>
+  );
+}

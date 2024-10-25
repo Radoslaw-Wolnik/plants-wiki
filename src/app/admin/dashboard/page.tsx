@@ -1,50 +1,45 @@
 // src/app/admin/dashboard/page.tsx
+'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import Layout from '@/components/Layout';
-import StatCard from '@/components/StatCard';
-import UserManagement from '@/components/UserManagement';
+import React, { useEffect } from 'react';
+import { DashboardStats } from '@/components/features/admin/DashboardStats';
+import { UserManagement } from '@/components/features/admin/UserManagement';
+import { RecentActions } from '@/components/features/admin/RecentActions';
+import { useAdminDashboard } from '@/hooks/useAdminDashboard';
+import { useAuth } from '@/contexts/AuthContext';
+import { Alert } from '@/components/ui';
+import { redirect } from 'next/navigation';
 
-const AdminDashboard: React.FC = () => {
-  const { data: session } = useSession();
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    activeUsers: 0,
-    totalPlants: 0,
-    totalArticles: 0,
-    flaggedContent: 0,
-  });
+export default function AdminDashboardPage() {
+  const { user } = useAuth();
+  const { stats, recentActions, refresh } = useAdminDashboard();
 
   useEffect(() => {
-    if (session?.user?.role === 'ADMIN') {
-      fetchStats();
-    }
-  }, [session]);
+    refresh();
+    const interval = setInterval(refresh, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
-  const fetchStats = async () => {
-    const response = await fetch('/api/admin/statistics');
-    const data = await response.json();
-    setStats(data);
-  };
-
-  if (session?.user?.role !== 'ADMIN') {
-    return <Layout><div>Access denied. Admin privileges required.</div></Layout>;
+  if (!user || user.role !== 'ADMIN') {
+    return redirect('/auth/signin');
   }
 
   return (
-    <Layout>
+    <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <StatCard title="Total Users" value={stats.totalUsers} />
-        <StatCard title="Active Users" value={stats.activeUsers} />
-        <StatCard title="Total Plants" value={stats.totalPlants} />
-        <StatCard title="Total Articles" value={stats.totalArticles} />
-        <StatCard title="Flagged Content" value={stats.flaggedContent} />
+      
+      <div className="space-y-6">
+        <DashboardStats stats={stats} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <UserManagement />
+          </div>
+          <div>
+            <RecentActions actions={recentActions} />
+          </div>
+        </div>
       </div>
-      <UserManagement />
-    </Layout>
+    </div>
   );
-};
-
-export default AdminDashboard;
+}

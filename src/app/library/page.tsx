@@ -1,47 +1,97 @@
-// src/pages/library/page.tsx
+// src/app/library/page.tsx
+'use client';
 
 import React, { useState, useEffect } from 'react';
-import Layout from '@/components/Layout';
-import RoomCard from '@/components/plants/RoomCard';
-import AddPlantModal from '@/components/plants/AddPlantModal';
+import { useUserPlants, usePlantCare } from '@/hooks';
+import { PlantList, PlantCareLog, PlantRoomCard } from '@/components/features/plants';
+import { Tabs, Button, Alert } from '@/components/ui';
+import { useAuth } from '@/contexts/AuthContext';
+import { Plus } from 'lucide-react';
 
-const UserLibraryPage: React.FC = () => {
-  const [rooms, setRooms] = useState([]);
-  const [isAddPlantModalOpen, setIsAddPlantModalOpen] = useState(false);
+export default function PlantLibraryPage() {
+  const { user } = useAuth();
+  const { userPlants, isLoading, error, addPlant, updatePlant, deletePlant } = useUserPlants();
+  const [selectedPlant, setSelectedPlant] = useState<number | null>(null);
+  const plantCare = usePlantCare(selectedPlant ?? 0);
 
-  useEffect(() => {
-    fetchRooms();
-  }, []);
-
-  const fetchRooms = async () => {
-    const response = await fetch('/api/users/rooms');
-    const data = await response.json();
-    setRooms(data);
-  };
+  const tabs = [
+    {
+      id: 'plants',
+      label: 'My Plants',
+      content: (
+        <div className="space-y-4">
+          {error && (
+            <Alert variant="danger">
+              There was an error loading your plants. Please try again.
+            </Alert>
+          )}
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">My Plants</h2>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Plant
+            </Button>
+          </div>
+          <PlantList
+            plants={userPlants.map(up => up.plant)}
+            onAddPlant={plant => setSelectedPlant(plant.id)}
+          />
+        </div>
+      ),
+    },
+    {
+      id: 'care',
+      label: 'Care Logs',
+      content: (
+        <div className="space-y-4">
+          {selectedPlant ? (
+            <PlantCareLog
+              wateringLogs={plantCare.wateringLogs}
+              fertilizingLogs={plantCare.fertilizingLogs}
+              onAddWatering={amount => plantCare.addWateringLog({ 
+                amount, 
+                date: new Date().toISOString() 
+              })}
+              onAddFertilizing={data => plantCare.addFertilizingLog({ 
+                ...data,
+                date: new Date().toISOString() 
+              })}
+            />
+          ) : (
+            <Alert>Select a plant to view and manage care logs.</Alert>
+          )}
+        </div>
+      ),
+    },
+    {
+      id: 'rooms',
+      label: 'Rooms',
+      content: (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">Rooms</h2>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Room
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {userPlants[0]?.room && (
+              <PlantRoomCard
+                room={userPlants[0].room}
+                onEdit={() => {}}
+                onDelete={() => {}}
+              />
+            )}
+          </div>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <Layout>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">My Plant Library</h1>
-        <button
-          onClick={() => setIsAddPlantModalOpen(true)}
-          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-        >
-          Add Plant
-        </button>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {rooms.map((room) => (
-          <RoomCard key={room.id} room={room} />
-        ))}
-      </div>
-      <AddPlantModal
-        isOpen={isAddPlantModalOpen}
-        onClose={() => setIsAddPlantModalOpen(false)}
-        onAddPlant={fetchRooms}
-      />
-    </Layout>
+    <div className="container mx-auto py-8">
+      <Tabs tabs={tabs} />
+    </div>
   );
-};
-
-export default UserLibraryPage;
+}
