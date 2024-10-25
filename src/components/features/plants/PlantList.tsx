@@ -1,7 +1,7 @@
 // src/components/features/plants/PlantList.tsx
 import React from 'react';
-import { Plant } from '@/types/global';
-import { Card, Button } from '../../components/ui';
+import { Plant } from '@/types';
+import { Card, Button } from '@/components/ui';
 import Image from 'next/image';
 import { Plus } from 'lucide-react';
 

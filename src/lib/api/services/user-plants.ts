@@ -7,6 +7,11 @@ export async function getUserPlantById(plantId: number) {
   return data;
 }
 
+export async function getUserPlants() {
+  const { data } = await apiClient.get<UserPlant[]>(`/users/library`);
+  return data;
+}
+
 export async function createUserPlant(plantData: {
   plantId: number;
   nickname?: string;

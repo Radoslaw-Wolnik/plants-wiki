@@ -1,7 +1,7 @@
 // src/components/features/plants/PlantRoomCard.tsx
 import React from 'react';
-import { Card, Button, Badge } from '../../components/ui';
-import { Room } from '@/types/global';
+import { Card, Button, Badge } from '@/components/ui';
+import { Room } from '@/types';
 import { Sun, Droplets } from 'lucide-react';
 
 interface PlantRoomCardProps {
@@ -49,11 +49,6 @@ export const PlantRoomCard: React.FC<PlantRoomCardProps> = ({
             <Droplets className="h-4 w-4 mr-2" />
             {room.humidity}
           </div>
-        </div>
-        <div className="mt-4">
-          <p className="text-sm text-neutral-500">
-            {room.userPlants.length} plants in this room
-          </p>
         </div>
       </div>
     </Card>

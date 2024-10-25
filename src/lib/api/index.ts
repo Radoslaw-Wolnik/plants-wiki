@@ -96,6 +96,7 @@ export {
   addFertilizingLog,
   moveUserPlantToRoom,
   addPlantToGraveyard,
+  getUserPlants,
 } from './services/user-plants';
 
 // Users exports

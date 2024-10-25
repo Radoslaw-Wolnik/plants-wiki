@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, Badge, Button } from '@/components/ui';
 import { formatDate } from '@/utils/general.util';
-import { PlantVerification } from '@/types/global';
+import { PlantVerification } from '@/types';
 
 interface PlantVerificationListProps {
   submissions: PlantVerification[];

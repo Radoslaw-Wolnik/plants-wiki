@@ -26,7 +26,7 @@ export const PlantFilters: React.FC<PlantFiltersProps> = ({
           <Select
             label="Light Level"
             value={filters.light}
-            onChange={(e) => onFilterChange({ ...filters, light: e.target.value })}
+            onChange={(value: string) => onFilterChange({ ...filters, light: value })}
             options={[
               { value: '', label: 'All Light Levels' },
               { value: 'low', label: 'Low Light' },
@@ -38,10 +38,7 @@ export const PlantFilters: React.FC<PlantFiltersProps> = ({
           <Select
             label="Difficulty"
             value={filters.difficulty}
-            onChange={(e) => onFilterChange({ 
-              ...filters, 
-              difficulty: e.target.value 
-            })}
+            onChange={(value: string) => onFilterChange({ ...filters, difficulty: value })}
             options={[
               { value: '', label: 'All Difficulties' },
               { value: 'beginner', label: 'Beginner' },
@@ -53,7 +50,7 @@ export const PlantFilters: React.FC<PlantFiltersProps> = ({
           <Select
             label="Plant Type"
             value={filters.type}
-            onChange={(e) => onFilterChange({ ...filters, type: e.target.value })}
+            onChange={(value: string) => onFilterChange({ ...filters, type: value })}
             options={[
               { value: '', label: 'All Types' },
               { value: 'flowering', label: 'Flowering' },

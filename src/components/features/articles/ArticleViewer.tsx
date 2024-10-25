@@ -3,20 +3,20 @@ import React from 'react';
 import { Card, Badge, Button } from '@/components/ui';
 import { DiscussionThread } from '@/components/features/discussions/DiscussionThread';
 import { Edit, MessageCircle } from 'lucide-react';
-import { Article } from '@/types';
+import { Article, ArticleResponse, PublicUser } from '@/types';
 import { formatDate } from '@/utils/general.util';
 import Link from 'next/link';
 import { useAuth } from '@/hooks';
 
 interface ArticleViewerProps {
-  article: Article;
+  article: ArticleResponse;
 }
 
 export const ArticleViewer: React.FC<ArticleViewerProps> = ({ article }) => {
   const { user } = useAuth();
   const canEdit = user && (
     user.role === 'ADMIN' || 
-    article.contributors.some(c => c.id === user.id)
+    article.contributors.some((c: PublicUser) => c.id === user.id)
   );
 
   return (
@@ -27,7 +27,7 @@ export const ArticleViewer: React.FC<ArticleViewerProps> = ({ article }) => {
             <div>
               <h1 className="text-3xl font-bold">{article.title}</h1>
               <div className="mt-2 space-x-2">
-                {article.contributors.map((contributor) => (
+                {article.contributors.map((contributor: PublicUser) => (
                   <Badge key={contributor.id}>
                     {contributor.username}
                   </Badge>

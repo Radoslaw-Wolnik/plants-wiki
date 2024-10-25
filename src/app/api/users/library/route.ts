@@ -6,7 +6,7 @@ import { UnauthorizedError, NotFoundError, InternalServerError, AppError } from 
 import { checkUserBanStatus } from '@/lib/userModeration';
 import logger from '@/lib/logger';
 import prisma from '@/lib/prisma';
-import { UserPlant } from '@/types/global';
+import { UserPlant } from '@/types';
 
 interface UserPlantExtended extends UserPlant {
   lastWatering?: Date;      // Add lastWatering property

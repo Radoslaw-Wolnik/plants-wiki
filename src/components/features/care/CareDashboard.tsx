@@ -34,11 +34,13 @@ export const CareDashboard: React.FC = () => {
             fertilizingLogs={plantCare.fertilizingLogs}
             onAddWatering={amount => plantCare.addWateringLog({ 
               amount, 
-              date: new Date().toISOString() 
+              date: new Date(),
+              notes: null
             })}
             onAddFertilizing={data => plantCare.addFertilizingLog({ 
               ...data,
-              date: new Date().toISOString() 
+              date: new Date(),
+              notes: null
             })}
           />
         </div>

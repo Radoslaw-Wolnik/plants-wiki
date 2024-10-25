@@ -1,55 +1,49 @@
-// src/components/features/articles/ArticleEditor.tsx
-import React, { useState } from 'react';
-import { 
-  Card, 
-  Input, 
-  Button, 
-  Select, 
-  Alert,
-  Tabs,
-} from '@/components/ui';
+import React, { useState, useEffect } from 'react';
+import { Card, Input, Button, Select, Alert, Tabs } from '@/components/ui';
 import { usePlants, useArticleEditor } from '@/hooks';
 import { ImageUpload } from '@/components/ui';
 import { MarkdownEditor } from './MarkdownEditor';
-import { Save, Eye, Image as ImageIcon } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 interface ArticleEditorProps {
   initialContent?: {
     title: string;
     content: string;
     plantId?: number;
+    images?: string[];
   };
-  onSave: (articleId: number) => void;
+  onSave: (id: number) => void;
 }
 
-export const ArticleEditor: React.FC<ArticleEditorProps> = ({
-  initialContent,
-  onSave,
-}) => {
+export const ArticleEditor: React.FC<ArticleEditorProps> = ({ initialContent, onSave }) => {
   const { content, setContent, uploadImage, saveArticle } = useArticleEditor();
   const { plants } = usePlants();
-  const [isPreview, setIsPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize content with initialContent if provided
+  useEffect(() => {
+    if (initialContent) {
+      setContent(initialContent);
+    }
+  }, [initialContent, setContent]);
+
   const handleImageUpload = async (file: File) => {
     try {
-      const imageUrl = await uploadImage(file);
-      setContent(prev => ({
-        ...prev,
-        images: [...prev.images, imageUrl],
-      }));
+      await uploadImage(file);
     } catch (err) {
       setError('Failed to upload image');
     }
   };
 
-  const handleSave = async (isDraft: boolean = false) => {
+  const handleSave = async (isDraft = false) => {
     try {
       setIsSaving(true);
       setError(null);
-      const article = await saveArticle(isDraft);
-      onSave(article.id);
+      const article = await saveArticle(); // Assume it returns an article object
+      if (article && article.id) {
+        onSave(article.id);
+      }
     } catch (err) {
       setError('Failed to save article');
     } finally {
@@ -66,10 +60,7 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
           <Input
             label="Title"
             value={content.title}
-            onChange={(e) => setContent(prev => ({
-              ...prev,
-              title: e.target.value,
-            }))}
+            onChange={(e) => setContent((prev) => ({ ...prev, title: e.target.value }))}
             placeholder="Enter article title..."
             required
           />
@@ -77,13 +68,10 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
           <Select
             label="Related Plant"
             value={content.plantId?.toString() || ''}
-            onChange={(e) => setContent(prev => ({
-              ...prev,
-              plantId: parseInt(e.target.value),
-            }))}
+            onChange={(e) => setContent((prev) => ({ ...prev, plantId: e.target.value ? parseInt(e.target.value) : undefined }))}
             options={[
               { value: '', label: 'Select a plant' },
-              ...plants.map(plant => ({
+              ...plants.map((plant) => ({
                 value: plant.id.toString(),
                 label: plant.name,
               })),
@@ -92,27 +80,9 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
           <MarkdownEditor
             value={content.content}
-            onChange={(value) => setContent(prev => ({
-              ...prev,
-              content: value,
-            }))}
-            onImageUpload={handleImageUpload}
+            onChange={(value) => setContent((prev) => ({ ...prev, content: value }))}
+            onImageUpload={handleImageUpload} // Changed to accept a single file
           />
-        </div>
-      ),
-    },
-    {
-      id: 'preview',
-      label: 'Preview',
-      content: (
-        <div className="prose max-w-none">
-          <h1>{content.title}</h1>
-          {content.plantId && (
-            <p className="text-neutral-600">
-              Related Plant: {plants.find(p => p.id === content.plantId)?.name}
-            </p>
-          )}
-          <div dangerouslySetInnerHTML={{ __html: content.content }} />
         </div>
       ),
     },
@@ -121,15 +91,11 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
       label: 'Images',
       content: (
         <div>
-          <ImageUpload onUpload={handleImageUpload} multiple />
+          <ImageUpload onChange={(files) => files.forEach(handleImageUpload)} multiple />
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            {content.images.map((url, index) => (
+            {content.images?.map((url, index) => (
               <div key={index} className="relative aspect-square">
-                <img
-                  src={url}
-                  alt={`Uploaded image ${index + 1}`}
-                  className="object-cover rounded-lg"
-                />
+                <img src={url} alt={`Uploaded image ${index + 1}`} className="object-cover rounded-lg" />
               </div>
             ))}
           </div>
@@ -140,35 +106,19 @@ export const ArticleEditor: React.FC<ArticleEditorProps> = ({
 
   return (
     <div className="space-y-4">
-      {error && (
-        <Alert variant="danger">
-          {error}
-        </Alert>
-      )}
-
+      {error && <Alert variant="danger">{error}</Alert>}
       <Card>
         <div className="border-b border-neutral-200">
           <div className="p-4 flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="success"
-                onClick={() => handleSave(false)}
-                disabled={isSaving}
-              >
-                <Save className="h-4 w-4 mr-2" />
-                Publish
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => handleSave(true)}
-                disabled={isSaving}
-              >
-                Save Draft
-              </Button>
-            </div>
+            <Button variant="success" onClick={() => handleSave(false)} disabled={isSaving}>
+              <Save className="h-4 w-4 mr-2" />
+              Publish
+            </Button>
+            <Button variant="ghost" onClick={() => handleSave(true)} disabled={isSaving}>
+              Save Draft
+            </Button>
           </div>
         </div>
-        
         <Tabs tabs={tabs} />
       </Card>
     </div>

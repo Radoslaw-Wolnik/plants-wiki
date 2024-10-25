@@ -42,7 +42,13 @@ export const PlantSubmissionForm: React.FC<PlantSubmissionFormProps> = ({
   onImageUploaded,
 }) => {
   const { submitPlant, isLoading, error } = usePlantSubmission();
-  const { register, handleSubmit, formState: { errors } } = useForm<PlantSubmissionFormData>({
+  const { 
+    register, 
+    handleSubmit, 
+    watch, 
+    setValue, 
+    formState: { errors } 
+  } = useForm<PlantSubmissionFormData>({
     resolver: zodResolver(plantSubmissionSchema),
   });
 
@@ -102,13 +108,14 @@ export const PlantSubmissionForm: React.FC<PlantSubmissionFormProps> = ({
           
           <Select
             label="Light Requirement"
-            {...register('light')}
-            error={errors.light?.message}
             options={[
               { value: 'low', label: 'Low Light' },
               { value: 'medium', label: 'Medium Light' },
               { value: 'high', label: 'High Light' },
             ]}
+            value={watch('light')}
+            onChange={(value) => setValue('light', value)}
+            error={errors.light?.message}
           />
 
           <Textarea
@@ -131,13 +138,14 @@ export const PlantSubmissionForm: React.FC<PlantSubmissionFormProps> = ({
 
           <Select
             label="Humidity"
-            {...register('humidity')}
-            error={errors.humidity?.message}
             options={[
               { value: 'low', label: 'Low' },
               { value: 'medium', label: 'Medium' },
               { value: 'high', label: 'High' },
             ]}
+            value={watch('humidity')}
+            onChange={(value) => setValue('humidity', value)}
+            error={errors.humidity?.message}
           />
         </div>
       </Card>
@@ -148,13 +156,14 @@ export const PlantSubmissionForm: React.FC<PlantSubmissionFormProps> = ({
           
           <Select
             label="Growth Cycle"
-            {...register('growthCycle')}
-            error={errors.growthCycle?.message}
             options={[
               { value: 'perennial', label: 'Perennial' },
               { value: 'annual', label: 'Annual' },
               { value: 'biennial', label: 'Biennial' },
             ]}
+            value={watch('growthCycle')}
+            onChange={(value) => setValue('growthCycle', value)}
+            error={errors.growthCycle?.message}
           />
 
           <Textarea
@@ -165,18 +174,20 @@ export const PlantSubmissionForm: React.FC<PlantSubmissionFormProps> = ({
 
           <Toggle
             label="Pet Safe"
-            {...register('petSafe')}
+            checked={watch('petSafe')}
+            onChange={(checked) => setValue('petSafe', checked)}
           />
 
           <Select
-            label="Plant Type"
-            {...register('plantType')}
-            error={errors.plantType?.message}
+            label="Plant Type" // < --------------------------------- change those types
             options={[
               { value: 'indoor', label: 'Indoor' },
               { value: 'outdoor', label: 'Outdoor' },
               { value: 'both', label: 'Both' },
             ]}
+            value={watch('plantType')}
+            onChange={(value) => setValue('plantType', value)}
+            error={errors.plantType?.message}
           />
         </div>
       </Card>

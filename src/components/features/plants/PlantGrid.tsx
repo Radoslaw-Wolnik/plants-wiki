@@ -1,7 +1,7 @@
 // src/components/features/plants/PlantGrid.tsx
 import React from 'react';
 import { Card, Badge } from '@/components/ui';
-import { Plant } from '@/types/global';
+import { Plant } from '@/types';
 import { Sun, Droplets, ThermometerSnowflake } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';

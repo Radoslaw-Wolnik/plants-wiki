@@ -1,6 +1,6 @@
 // src/lib/api/services/articles.ts
 import { apiClient } from '../client';
-import { PaginatedResponse, PaginationParams, Article, ArticlePhoto, Discussion } from '@/types';
+import { PaginatedResponse, PaginationParams, Article, ArticlePhoto, Discussion, ArticleResponse } from '@/types';
 
 export async function getAllArticles(params: PaginationParams) {
   const { data } = await apiClient.get<PaginatedResponse<Article>>('/articles', { params });
@@ -8,7 +8,7 @@ export async function getAllArticles(params: PaginationParams) {
 }
 
 export async function getArticleById(id: number) {
-  const { data } = await apiClient.get<Article>(`/articles/${id}`);
+  const { data } = await apiClient.get<ArticleResponse>(`/articles/${id}`);
   return data;
 }
 

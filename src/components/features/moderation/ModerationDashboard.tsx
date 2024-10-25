@@ -59,14 +59,14 @@ export const ModerationDashboard: React.FC = () => {
                 <Button
                   variant="success"
                   size="sm"
-                  onClick={() => handleFlag(item.id, 'keep')}
+                  onClick={() => handleFlag(item.id, 'APPROVE')}
                 >
                   Keep
                 </Button>
                 <Button
                   variant="danger"
                   size="sm"
-                  onClick={() => handleFlag(item.id, 'remove')}
+                  onClick={() => handleFlag(item.id, 'REJECT')}
                 >
                   Remove
                 </Button>
