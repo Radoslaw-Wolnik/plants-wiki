@@ -4,24 +4,24 @@ import { Prisma } from "@prisma/client";
 
 
 export type UserWithLibrary = Prisma.UserGetPayload<{
-    include: { 
-      library: {
-        include: {
-          userPlants: true;
-        };
+  include: { 
+    library: {
+      include: {
+        userPlants: true;
       };
     };
-  }>;
-  
-  export type ArticleWithDetails = Prisma.ArticleGetPayload<{
-    include: {
-      plant: true;
-      contributors: true;
-      comments: {
-        include: {
-          user: true;
-        };
+  };
+}>;
+
+export type ArticleWithDetails = Prisma.ArticleGetPayload<{
+  include: {
+    plant: true;
+    contributors: true;
+    comments: {
+      include: {
+        user: true;
       };
-      photos: true;
     };
-  }>;
+    photos: true;
+  };
+}>;

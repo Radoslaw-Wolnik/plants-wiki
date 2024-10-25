@@ -1,11 +1,36 @@
-// src/hooks/useApi.ts
+// src/hooks/api/useApi.ts
 import { useState, useCallback } from 'react';
 import { useConfig } from '@/hooks';
-import { handleError } from '@/utils/error';
+import { QueryParams } from '@/types';
+
+export class ApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
 
 interface UseApiOptions<T> {
   onSuccess?: (data: T) => void;
   onError?: (error: Error) => void;
+}
+
+
+
+function buildQueryString(params: QueryParams): string {
+  const searchParams = new URLSearchParams();
+  
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      searchParams.append(key, String(value));
+    }
+  });
+  
+  const queryString = searchParams.toString();
+  return queryString ? `?${queryString}` : '';
 }
 
 export function useApi<T = unknown>(endpoint: string, options: UseApiOptions<T> = {}) {
@@ -15,12 +40,12 @@ export function useApi<T = unknown>(endpoint: string, options: UseApiOptions<T> 
   const { apiUrl } = useConfig();
 
   const execute = useCallback(
-    async (config: RequestInit = {}) => {
+    async (path: string, config: RequestInit = {}) => {
       try {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetch(`${apiUrl}${endpoint}`, {
+        const response = await fetch(`${apiUrl}${endpoint}${path}`, {
           ...config,
           headers: {
             'Content-Type': 'application/json',
@@ -29,7 +54,11 @@ export function useApi<T = unknown>(endpoint: string, options: UseApiOptions<T> 
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorData = await response.json().catch(() => ({ message: 'Request failed' }));
+          throw new ApiError(
+            errorData.message || 'Request failed',
+            response.status
+          );
         }
 
         const result = await response.json();
@@ -37,10 +66,13 @@ export function useApi<T = unknown>(endpoint: string, options: UseApiOptions<T> 
         options.onSuccess?.(result);
         return result;
       } catch (err) {
-        const error = handleError(err);
-        setError(new Error(error.message));
-        options.onError?.(new Error(error.message));
-        throw error;
+        const apiError = err instanceof ApiError ? err : new ApiError(
+          err instanceof Error ? err.message : 'An unexpected error occurred',
+          500
+        );
+        setError(apiError);
+        options.onError?.(apiError);
+        throw apiError;
       } finally {
         setIsLoading(false);
       }
@@ -48,16 +80,43 @@ export function useApi<T = unknown>(endpoint: string, options: UseApiOptions<T> 
     [apiUrl, endpoint, options]
   );
 
-  const get = useCallback(() => execute({ method: 'GET' }), [execute]);
-  
-  const post = useCallback((data: unknown) => 
-    execute({ method: 'POST', body: JSON.stringify(data) }), [execute]);
-  
-  const put = useCallback((data: unknown) => 
-    execute({ method: 'PUT', body: JSON.stringify(data) }), [execute]);
-  
-  const del = useCallback(() => 
-    execute({ method: 'DELETE' }), [execute]);
+  const get = useCallback(
+    (queryParams?: QueryParams) => {
+      const queryString = queryParams ? buildQueryString(queryParams) : '';
+      return execute(queryString, { method: 'GET' });
+    },
+    [execute]
+  );
+
+  const post = useCallback(
+    <D = unknown>(data?: D, queryParams?: QueryParams) => {
+      const queryString = queryParams ? buildQueryString(queryParams) : '';
+      return execute(queryString, {
+        method: 'POST',
+        body: data ? JSON.stringify(data) : undefined,
+      });
+    },
+    [execute]
+  );
+
+  const put = useCallback(
+    <D = unknown>(data?: D, queryParams?: QueryParams) => {
+      const queryString = queryParams ? buildQueryString(queryParams) : '';
+      return execute(queryString, {
+        method: 'PUT',
+        body: data ? JSON.stringify(data) : undefined,
+      });
+    },
+    [execute]
+  );
+
+  const del = useCallback(
+    (queryParams?: QueryParams) => {
+      const queryString = queryParams ? buildQueryString(queryParams) : '';
+      return execute(queryString, { method: 'DELETE' });
+    },
+    [execute]
+  );
 
   return {
     data,
