@@ -1,5 +1,5 @@
 // src/hooks/useAdminDashboard.ts
-import { useApi } from '@/hooks/useApi';
+import { useApi } from '@/hooks';
 import { useToast } from '@/hooks/ui/useToast';
 
 interface AdminStats {

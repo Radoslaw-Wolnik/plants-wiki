@@ -12,6 +12,11 @@ export interface Toast {
   action?: React.ReactNode;
 }
 
+export interface ToastOptions extends Omit<Toast, 'id'> {
+  duration?: number;
+  action?: React.ReactNode;
+}
+
 const TOAST_LIMIT = 5;
 const DEFAULT_DURATION = 5000;
 
@@ -30,7 +35,18 @@ function dispatch(toasts: Toast[]) {
   listeners.forEach((listener) => listener(toasts));
 }
 
-export function useToast() {
+export interface ToastAPI {
+  toasts: Toast[];
+  toast: (options: ToastOptions) => string;
+  success: (message: string, options?: Partial<ToastOptions>) => string;
+  error: (message: string, options?: Partial<ToastOptions>) => string;
+  warning: (message: string, options?: Partial<ToastOptions>) => string;
+  info: (message: string, options?: Partial<ToastOptions>) => string;
+  dismiss: (toastId: string) => void;
+  dismissAll: () => void;
+}
+
+export function useToast(): ToastAPI {
   const [toasts, setToasts] = useState<Toast[]>(memoryToasts);
 
   useEffect(() => {
@@ -40,12 +56,12 @@ export function useToast() {
     };
   }, []);
 
-  function addToast(toast: Omit<Toast, "id">) {
+  function addToast(options: ToastOptions) {
     const id = generateId();
-    const duration = toast.duration ?? DEFAULT_DURATION;
-
+    const duration = options.duration ?? DEFAULT_DURATION;
+    
     const newToast = {
-      ...toast,
+      ...options,
       id,
       duration,
     };
@@ -69,9 +85,45 @@ export function useToast() {
     dispatch([]);
   }
 
+  const success = (message: string, options: Partial<ToastOptions> = {}) => 
+    addToast({
+      title: "Success",
+      description: message,
+      variant: "success",
+      ...options,
+    });
+
+  const error = (message: string, options: Partial<ToastOptions> = {}) => 
+    addToast({
+      title: "Error",
+      description: message,
+      variant: "danger",
+      ...options,
+    });
+
+  const warning = (message: string, options: Partial<ToastOptions> = {}) => 
+    addToast({
+      title: "Warning",
+      description: message,
+      variant: "warning",
+      ...options,
+    });
+
+  const info = (message: string, options: Partial<ToastOptions> = {}) => 
+    addToast({
+      title: "Info",
+      description: message,
+      variant: "info",
+      ...options,
+    });
+
   return {
     toasts,
     toast: addToast,
+    success,
+    error,
+    warning,
+    info,
     dismiss,
     dismissAll,
   };

@@ -1,6 +1,6 @@
 // src/hooks/usePlantCare.ts
-import { useApi } from '@/hooks/useApi';
-import { WateringLog, FertilizingLog } from '@/types/api';
+import { useApi } from '@/hooks';
+import { WateringLog, FertilizingLog } from '@/types';
 
 export function usePlantCare(plantId: number) {
   const wateringApi = useApi<WateringLog[]>(`/users/library/plants/${plantId}/watering`);

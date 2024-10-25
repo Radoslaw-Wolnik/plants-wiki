@@ -1,7 +1,6 @@
 // src/hooks/usePlants.ts
-import { useApi } from './useApi';
-import { Plant } from '@/types/global';
-import { PaginatedResponse } from '@/types/api';
+import { useApi } from '@/hooks';
+import { PaginatedResponse, Plant } from '@/types';
 
 interface UsePlantsParams {
   page?: number;

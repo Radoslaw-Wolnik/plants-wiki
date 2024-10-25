@@ -1,8 +1,8 @@
 // src/contexts/AuthContext.tsx
-import { createContext, useContext, useCallback, useEffect } from 'react';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { createContext, useContext, useCallback, useEffect, useState } from 'react';
+import { useSession, signIn as nextAuthSignIn, signOut as nextAuthSignOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { SafeUser } from '@/types/global';
+import { SafeUser } from '@/types';
 
 export interface AuthContextType {
   user: SafeUser | null;
@@ -10,6 +10,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   signIn: (credentials: { username: string; password: string }) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,12 +18,14 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [user, setUser] = useState<SafeUser | null>(null);
 
   const handleSignIn = useCallback(async (credentials: { username: string; password: string }) => {
     try {
-      const result = await signIn('credentials', {
+      const result = await nextAuthSignIn('credentials', {
         redirect: false,
-        ...credentials,
+        username: credentials.username,
+        password: credentials.password,
       });
 
       if (result?.error) {
@@ -36,16 +39,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   const handleSignOut = useCallback(async () => {
-    await signOut({ redirect: false });
+    await nextAuthSignOut({ redirect: false });
     router.push('/auth/signin');
   }, [router]);
 
+  const refreshUser = async () => {
+    try {
+      const response = await fetch('/api/auth/me');
+      const userData = await response.json();
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (session?.user) {
+      setUser(session.user as SafeUser);
+    } else {
+      setUser(null);
+    }
+  }, [session]);
+
   const value = {
-    user: session?.user as SafeUser | null,
+    user: user,
     isLoading: status === 'loading',
-    isAuthenticated: !!session,
+    isAuthenticated: !!user,
     signIn: handleSignIn,
     signOut: handleSignOut,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,7 +1,7 @@
 // src/hooks/useApi.ts
 import { useState, useCallback } from 'react';
-import { useConfig } from './useConfig';
-import { handleError } from '../utils/error';
+import { useConfig } from '@/hooks';
+import { handleError } from '@/utils/error';
 
 interface UseApiOptions<T> {
   onSuccess?: (data: T) => void;

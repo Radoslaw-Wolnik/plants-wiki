@@ -1,7 +1,7 @@
 // src/hooks/useArticleEditor.ts
-import { useApi } from '@/hooks/useApi';
-import { Article, ChangeRequest } from '@/types/global';
-import { useToast } from '@/hooks/useToast';
+import { useApi } from '@/hooks';
+import { Article, ChangeRequest } from '@/types';
+import { useToast } from '@/hooks';
 
 export function useArticleEditor(articleId?: number) {
   const toast = useToast();

@@ -3,10 +3,10 @@ import React from 'react';
 import { Card, Badge, Button } from '@/components/ui';
 import { DiscussionThread } from '@/components/features/discussions/DiscussionThread';
 import { Edit, MessageCircle } from 'lucide-react';
-import { Article } from '@/types/global';
+import { Article } from '@/types';
 import { formatDate } from '@/utils/general.util';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks';
 
 interface ArticleViewerProps {
   article: Article;

@@ -1,7 +1,7 @@
 // src/components/features/articles/RevisionHistory.tsx
 import React from 'react';
 import { Card, Button } from '@/components/ui';
-import { useArticleHistory } from '@/hooks/features/articles/useArticleHistory';
+import { useArticleHistory } from '@/hooks';
 import { formatDate } from '@/utils/general.util';
 import { History, RotateCcw } from 'lucide-react';
 

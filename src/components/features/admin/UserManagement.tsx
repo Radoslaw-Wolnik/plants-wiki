@@ -1,12 +1,34 @@
 // src/components/features/admin/UserManagement.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Input, Select, Button, Badge } from '@/components/ui';
 import { useAdminUsers } from '@/hooks/features/admin/useAdminUsers';
 import { Search, MoreVertical } from 'lucide-react';
 import { formatDate } from '@/utils/general.util';
+import { useApi } from '@/hooks';
+import { AdminUser } from '@/types';
+
+interface Filters {
+  search: string;
+  role: string;
+  status: string;
+}
 
 export const UserManagement: React.FC = () => {
-  const { users, isLoading, filters, setFilters, fetchUsers } = useAdminUsers();
+  const { users, isLoading, error, get } = useApi<AdminUser[]>('/admin/users');
+  const [filters, setFilters] = useState<Filters>({
+    search: '',
+    role: '',
+    status: '',
+  });
+
+  const handleChange = (key: keyof Filters) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: e.target.value
+    }));
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

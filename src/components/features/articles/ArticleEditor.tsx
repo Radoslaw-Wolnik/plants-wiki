@@ -8,10 +8,9 @@ import {
   Alert,
   Tabs,
 } from '@/components/ui';
-import { useArticleEditor } from '@/hooks/features/articles/useArticleEditor';
-import { usePlants } from '@/hooks/api/usePlants';
-import { ImageUpload } from '@/components/ui/image-upload';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { usePlants, useArticleEditor } from '@/hooks';
+import { ImageUpload } from '@/components/ui';
+import { MarkdownEditor } from './MarkdownEditor';
 import { Save, Eye, Image as ImageIcon } from 'lucide-react';
 
 interface ArticleEditorProps {

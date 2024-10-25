@@ -1,6 +1,6 @@
 // src/hooks/useUserPlants.ts
-import { useApi } from '@/hooks/useApi';
-import { UserPlant } from '@/types/global';
+import { useApi } from '@/hooks';
+import { UserPlant } from '@/types';
 
 export function useUserPlants() {
   const { data, error, isLoading, get, post, put, delete: del } = 

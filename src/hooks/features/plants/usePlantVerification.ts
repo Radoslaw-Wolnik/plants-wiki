@@ -1,7 +1,6 @@
 // src/hooks/usePlantVerification.ts
-import { useApi } from '@/hooks/useApi';
-import { PlantVerification } from '@/types/global';
-import { useAuth } from '@/contexts/AuthContext';
+import { useApi, useAuth } from '@/hooks';
+import { PlantVerification } from '@/types';
 
 export function usePlantVerification() {
   const { user } = useAuth();

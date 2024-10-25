@@ -1,7 +1,7 @@
 // src/components/features/articles/ChangeRequestViewer.tsx
 import React from 'react';
 import { Card, Badge, Button } from '@/components/ui';
-import { ChangeRequest } from '@/types/global';
+import { ChangeRequest } from '@/types';
 import { formatDate } from '@/utils/general.util';
 import { DiffViewer } from './DiffViewer';
 

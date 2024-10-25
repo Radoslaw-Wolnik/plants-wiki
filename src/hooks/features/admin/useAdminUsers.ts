@@ -1,6 +1,6 @@
 // src/hooks/useAdminUsers.ts
-import { useApi } from '@/hooks/useApi';
-import { User } from '@/types/global';
+import { useApi } from '@/hooks';
+import { User } from '@/types';
 import { useState } from 'react';
 
 interface UserWithStats extends User {

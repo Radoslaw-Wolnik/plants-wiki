@@ -1,6 +1,6 @@
 // src/hooks/useModeration.ts
-import { useApi } from '@/hooks/useApi';
-import { ModerationType } from '@/types/global';
+import { useApi } from '@/hooks';
+import { ModerationType } from '@/types';
 
 interface ModerationStats {
   pendingChangeRequests: number;

@@ -38,7 +38,6 @@ export * from './features/moderation/useModeration';
 export * from './features/plants/usePlantBrowser';
 export * from './features/plants/useUserPlants';
 export * from './features/plants/usePlantCareSchedule';
-export * from './features/plants/useCareReminders';
 export * from './features/plants/useGraveyard';
 export * from './features/plants/usePlantCare';
 export * from './features/plants/usePlantDetails';

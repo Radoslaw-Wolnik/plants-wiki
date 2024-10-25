@@ -1,8 +1,8 @@
 // src/components/features/admin/DashboardStats.tsx
 import React from 'react';
 import { Card } from '@/components/ui';
-import { Users, BookOpen, Plant, AlertTriangle, Clock } from 'lucide-react';
-import { AdminStats } from '@/types/global';
+import { Users, BookOpen, Leaf, AlertTriangle, Clock } from 'lucide-react';
+import { AdminStats } from '@/types';
 
 interface DashboardStatsProps {
   stats: AdminStats;
@@ -17,7 +17,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
       subtext: `${stats.newUsersToday} new today`,
     },
     {
-      icon: <Plant className="h-6 w-6 text-success-500" />,
+      icon: <Leaf className="h-6 w-6 text-success-500" />,
       label: 'Total Plants',
       value: stats.totalPlants,
       subtext: `${stats.pendingVerifications} pending verification`,

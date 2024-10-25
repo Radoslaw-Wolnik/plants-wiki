@@ -1,7 +1,6 @@
 // src/hooks/usePlantSubmission.ts
-import { useApi } from '@/hooks/useApi';
-import { PlantVerification } from '@/types/global';
-import { useToast } from './hooks/useToast';
+import { PlantVerification } from '@/types';
+import { useApi, useToast } from '@/hooks';
 
 interface PlantSubmissionData {
   name: string;

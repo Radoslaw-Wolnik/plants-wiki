@@ -1,7 +1,6 @@
 // src/hooks/useArticleHistory.ts
-import { useApi } from '@/hooks/useApi';
-import { ArticleRevision } from '@/types/global';
-import { useToast } from '@/hooks/useToast';
+import { useApi, useToast } from '@/hooks';
+import { ArticleRevision } from '@/types';
 
 interface ArticleRevision {
   id: number;

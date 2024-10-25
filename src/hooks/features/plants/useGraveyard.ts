@@ -1,7 +1,6 @@
 // src/hooks/useGraveyard.ts
-import { useApi } from '@/hooks/useApi';
-import { GraveyardItem } from '@/types/global';
-import { useToast } from '@/hooks/ui/useToast';
+import { useApi, useToast } from '@/hooks';
+import { GraveyardItem } from '@/types';
 
 export function useGraveyard() {
   const { data, error, isLoading, get, post, delete: del } = 

@@ -16,3 +16,4 @@ export { default as Toggle } from './toggle';
 export { default as Tooltip } from './tooltip';
 export { Toast, Toaster } from './toast';
 export * from './card';
+export { ImageUpload } from './image-upload';

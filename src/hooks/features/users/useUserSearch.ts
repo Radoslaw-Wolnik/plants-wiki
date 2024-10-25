@@ -1,7 +1,6 @@
 // src/hooks/useUserSearch.ts
-import { useApi } from '@/hooks/useApi';
-import { User } from '@/types/global';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useApi, useDebounce } from '@/hooks';
+import { User } from '@/types';
 import { useState, useEffect } from 'react';
 
 export function useUserSearch() {

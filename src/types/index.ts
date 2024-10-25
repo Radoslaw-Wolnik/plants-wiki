@@ -6,3 +6,4 @@ export * from './api/auth';
 export * from './api/responses';
 export * from './api/relations';
 export * from './api/users';
+export * from './admin';

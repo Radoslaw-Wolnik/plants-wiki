@@ -1,6 +1,6 @@
 // src/hooks/usePlantBrowser.ts
-import { useApi } from '@/hooks/useApi';
-import { Plant, PaginatedResponse } from '@/types/global';
+import { useApi } from '@/hooks';
+import { Plant, PaginatedResponse } from '@/types';
 import { useState } from 'react';
 
 interface PlantFilters {

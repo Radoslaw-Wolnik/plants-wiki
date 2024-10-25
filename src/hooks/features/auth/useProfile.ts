@@ -1,8 +1,6 @@
 // src/hooks/useProfile.ts
-import { useApi } from '@/hooks/useApi';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/ui/useToast';
-import { User } from '@/types/global';
+import { useApi, useAuth, useToast } from '@/hooks';
+import { User } from '@/types';
 
 interface ProfileStats {
   totalPlants: number;
