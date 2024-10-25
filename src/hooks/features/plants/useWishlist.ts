@@ -1,10 +1,10 @@
 // src/hooks/useWishlist.ts
 import { useApi, useToast } from '@/hooks';
-import { WishlistItem } from '@/types';
+import { WishlistPlant } from '@/types';
 
 export function useWishlist() {
   const { data, error, isLoading, get, post, delete: del } = 
-    useApi<WishlistItem[]>('/users/wishlist');
+    useApi<WishlistPlant[]>('/users/wishlist');
   const toast = useToast();
 
   const addToWishlist = async (plantData: { 

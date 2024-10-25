@@ -12,7 +12,7 @@ export function usePlantVerification() {
     decision: 'APPROVED' | 'REJECTED',
     feedback?: string
   ) => {
-    return await put(`/plants/verifications/${submissionId}`, {
+    return await put(`${submissionId}`, {
       status: decision,
       feedback,
       reviewerId: user?.id,

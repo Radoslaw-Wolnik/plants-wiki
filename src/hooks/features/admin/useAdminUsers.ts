@@ -1,32 +1,22 @@
 // src/hooks/useAdminUsers.ts
 import { useApi } from '@/hooks';
-import { User } from '@/types';
+import { User, AdminUser, QueryParams } from '@/types';
 import { useState } from 'react';
 
-interface UserWithStats extends User {
-  stats: {
-    plants: number;
-    articles: number;
-    reports: number;
-  };
+interface UserFilters extends QueryParams {
+  role?: string;
+  status?: string;
+  search?: string;
+  [key: string]: string | number | boolean | undefined;
 }
 
 export function useAdminUsers() {
-  const [filters, setFilters] = useState({
-    role: '',
-    status: '',
-    search: '',
-  });
-
-  const { data, isLoading, error, get } = 
-    useApi<UserWithStats[]>('/admin/users');
+  const [filters, setFilters] = useState<UserFilters>({});
+  const { data, isLoading, error, get } = useApi<AdminUser[]>('/admin/users');
 
   const fetchUsers = async () => {
-    const params = new URLSearchParams();
-    if (filters.role) params.append('role', filters.role);
-    if (filters.status) params.append('status', filters.status);
-    if (filters.search) params.append('search', filters.search);
-    await get(`?${params.toString()}`);
+    // Now this is type-safe
+    await get(filters);
   };
 
   return {

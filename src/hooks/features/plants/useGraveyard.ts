@@ -1,10 +1,10 @@
 // src/hooks/useGraveyard.ts
 import { useApi, useToast } from '@/hooks';
-import { GraveyardItem } from '@/types';
+import { GraveyardPlant } from '@/types';
 
 export function useGraveyard() {
   const { data, error, isLoading, get, post, delete: del } = 
-    useApi<GraveyardItem[]>('/users/graveyard');
+    useApi<GraveyardPlant[]>('/users/graveyard');
   const toast = useToast();
 
   const addToGraveyard = async (plantData: {

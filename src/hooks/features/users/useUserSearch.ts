@@ -1,7 +1,13 @@
-// src/hooks/useUserSearch.ts
-import { useApi, useDebounce } from '@/hooks';
-import { User } from '@/types';
+// src/hooks/features/users/useUserSearch.ts
+import { useApi } from '@/hooks/api/useApi';
+import { useDebounce } from '@/hooks/utils/useDebounce';
+import { User, QueryParams } from '@/types';
 import { useState, useEffect } from 'react';
+
+interface SearchFilters extends QueryParams {
+  query?: string;
+  [key: string]: string | number | boolean | undefined;
+}
 
 export function useUserSearch() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,9 +16,10 @@ export function useUserSearch() {
 
   useEffect(() => {
     if (debouncedSearch) {
-      get(`?query=${debouncedSearch}`);
+      // Now using the proper query params object
+      get({ query: debouncedSearch });
     }
-  }, [debouncedSearch]);
+  }, [debouncedSearch, get]);
 
   return {
     users: data ?? [],

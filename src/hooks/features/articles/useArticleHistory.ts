@@ -2,20 +2,6 @@
 import { useApi, useToast } from '@/hooks';
 import { ArticleRevision } from '@/types';
 
-interface ArticleRevision {
-  id: number;
-  content: string;
-  createdAt: string;
-  author: {
-    id: number;
-    username: string;
-  };
-  changeRequest?: {
-    id: number;
-    status: 'APPROVED' | 'REJECTED' | 'PENDING';
-  };
-}
-
 export function useArticleHistory(articleId: number) {
   const { data, error, isLoading, get } = 
     useApi<ArticleRevision[]>(`/articles/${articleId}/history`);
