@@ -4,8 +4,8 @@ import React from 'react';
 import { Inter } from 'next/font/google';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import './globals.css';
-import { Toaster } from "@/components/ui/toaster"
+import '@/styles/globals.css'
+import { Toaster } from "@/components/ui/toast";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,7 +26,7 @@ export default function RootLayout({
           <Navbar />
           <main className="flex-grow container mx-auto px-4 py-8">
             {children}
-            <Toaster />
+            <Toaster position="top-right" />
           </main>
           <Footer />
         </div>
